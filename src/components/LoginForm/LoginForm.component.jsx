@@ -140,6 +140,8 @@ const LoginForm = () => {
 
                     {serverError && <small className={styles.errorMessage}>{serverError}</small>}
                     <div className={styles.RegistrationLink}>
+                        <Link to="/forgot-password">Password dimenticata?</Link>
+                        <span> | </span>
                         <Link to="/registration">Registrati</Link>
                     </div>
                 </form>
