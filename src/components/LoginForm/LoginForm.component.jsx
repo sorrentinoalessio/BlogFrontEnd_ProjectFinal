@@ -7,8 +7,6 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { IoLogIn } from "react-icons/io5";
 import { toast } from "react-toastify";
 
-
-
 const LoginForm = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -18,16 +16,14 @@ const LoginForm = () => {
         if (hasShownToast.current) return;
         hasShownToast.current = true;
         const confirmed = searchParams.get('confirmed');
-        console.log(confirmed);
         if (confirmed === 'true') {
-            setTimeout(() => toast.success('Conferma avvenuta. Registrazione completata!'), 0);
+            setTimeout(() => toast.success('Email confermata! Ora puoi effettuare il login.'), 0);
             navigate('/login', { replace: true });
         } else if (confirmed === 'false') {
-            setTimeout(() => toast.error(searchParams.get('message') || 'Errore durante la conferma.'), 0);
+            setTimeout(() => toast.error(searchParams.get('message') || 'Link di conferma non valido o scaduto.'), 0);
             navigate('/login', { replace: true });
         }
     }, []);
-
 
     useEffect(() => {
         if (localStorage.getItem("token")) {
@@ -57,15 +53,13 @@ const LoginForm = () => {
         setServerError("");
         let hasError = false;
 
-
         if (!formValue.email || formValue.email.trim() === "") {
             setEmailError("Email obbligatoria");
             hasError = true;
-        } else
-            if (!formValue.email.includes("@")) {
-                setEmailError("Email non valida");
-                hasError = true;
-            }
+        } else if (!formValue.email.includes("@")) {
+            setEmailError("Email non valida");
+            hasError = true;
+        }
         if (!formValue.password || formValue.password.trim() === "") {
             setPasswordError("Password obbligatoria");
             hasError = true;
@@ -96,7 +90,6 @@ const LoginForm = () => {
         }
     };
 
-
     const emailOk =
         formValue.email.trim() !== "" && formValue.email.includes("@");
 
@@ -108,7 +101,6 @@ const LoginForm = () => {
     return (
         <div className={styles.page}>
             <Card className="card" title="Login">
-
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <Input
                         id="email"
