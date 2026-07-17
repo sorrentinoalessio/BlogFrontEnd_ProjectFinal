@@ -1,14 +1,14 @@
-import { useState, useEffect  } from "react";
+import { useState, useEffect } from "react";
 import styles from "./ResetPassForm.module.css";
-import {resetPassword } from "../services/resetPass.service.js";
+import { resetPassword, verifyResetToken } from "../services/resetPass.service.js";
 import Card from "../Card/Card.jsx";
 import { toast } from "react-toastify";
-import { useNavigate ,useParams} from 'react-router-dom';
-
+import { useNavigate, useParams } from 'react-router-dom';
 
 const ResetPasswordForm = () => {
     const { token } = useParams();
     const navigate = useNavigate();
+    const [checkingToken, setCheckingToken] = useState(true);
 
     const [formValue, setFormValue] = useState({
         password: "",
@@ -20,13 +20,23 @@ const ResetPasswordForm = () => {
         confermaPassword: "",
     });
 
+    useEffect(() => {
+        const checkToken = async () => {
+            try {
+                await verifyResetToken(token);
+                setCheckingToken(false);
+            } catch (error) {
+                toast.error("Link non valido o scaduto");
+                navigate("/login", { replace: true });
+            }
+        };
+        checkToken();
+    }, [token, navigate]);
+
     const handleChange = (e) => {
         setErrors({ ...errors, [e.target.name]: "" });
         setFormValue({ ...formValue, [e.target.name]: e.target.value });
     };
-    useEffect(() => {
-        console.log(formValue);
-    }, [formValue]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -60,10 +70,11 @@ const ResetPasswordForm = () => {
         }
     };
 
+    if (checkingToken) return <p>Verifica del link in corso...</p>;
+
     return (
         <Card title="Reset Password">
             <form className={styles.form} onSubmit={handleSubmit}>
-
                 <div className={styles.form_field}>
                     <label htmlFor="password">Password</label>
                     <input
@@ -93,7 +104,6 @@ const ResetPasswordForm = () => {
                 <button type="submit" className={styles.submit_button}>
                     Reset Password
                 </button>
-
             </form>
         </Card>
     );
