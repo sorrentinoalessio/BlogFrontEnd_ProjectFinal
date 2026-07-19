@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "./LoginForm.module.css";
 import { signIn } from "../services/login.service.js";
+import { setUser, userSelectors } from "../../reducers/user.slice"; // adatta il path
 import Input from "../Input/Input.component.jsx";
 import Card from "../Card/Card";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -10,6 +12,8 @@ import { toast } from "react-toastify";
 const LoginForm = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const user = useSelector(userSelectors.selectUser);
     const hasShownToast = useRef(false);
 
     useEffect(() => {
@@ -26,10 +30,10 @@ const LoginForm = () => {
     }, []);
 
     useEffect(() => {
-        if (localStorage.getItem("token")) {
+        if (user?.accessToken) {
             navigate("/");
         }
-    }, [navigate]);
+    }, [user?.accessToken, navigate]);
 
     const [formValue, setFormValue] = useState({
         email: "",
@@ -78,9 +82,11 @@ const LoginForm = () => {
             });
             if (data.accessToken) {
                 const cleanToken = String(data.accessToken).replace(/^['"]|['"]$/g, "");
-                localStorage.setItem("token", cleanToken);
-                localStorage.setItem("user", JSON.stringify(data.name));
-                window.dispatchEvent(new Event("storage"));
+                dispatch(setUser({
+                    name: data.name,
+                    accessToken: cleanToken,
+                    refreshToken: data.refreshToken,
+                }));
                 navigate("/posts");
             }
             toast.success("Login effettuato");

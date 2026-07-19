@@ -23,10 +23,9 @@ export const getPost = async (token) => {
   return data;
 };
 
-export const updatePostStatus = async (postId, payload) => {
-  const tokenRaw = localStorage.getItem("token");
-  const token = tokenRaw?.replace(/^['"]|['"]$/g, "");
-  if (!token) throw new Error("Utente non autenticato");
+export const updatePostStatus = async (postId, payload, token) => {
+  const cleanToken = token?.replace(/^['"]|['"]$/g, "");
+  if (!cleanToken) throw new Error("Utente non autenticato");
 
   const response = await fetch(
     `http://127.0.0.1:3001/user/post/update/${postId}`,
@@ -34,7 +33,7 @@ export const updatePostStatus = async (postId, payload) => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${cleanToken}`,
       },
       body: JSON.stringify(payload),
     }

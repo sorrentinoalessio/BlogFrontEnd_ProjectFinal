@@ -2,10 +2,11 @@ import { TabPanel, Tabs } from "../../Tabs/Tabs";
 import PostList from "../PostList/PostList";
 import { getPost } from "../../services/post.service";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Loader from "../../Loader/Loader.component";
 import styles from "./PostPage.module.css";
 import { useNavigate } from "react-router-dom";
-
+import { userSelectors } from "../../../reducers/user.slice"; // adatta il path
 
 const STATUS = [
   { value: "draft", label: "Bozze" },
@@ -18,11 +19,10 @@ const PostPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const rawUser = localStorage.getItem("user");
-  const user = rawUser ? JSON.parse(rawUser) : null;
+  const user = useSelector(userSelectors.selectUser);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = user?.accessToken;
     if (!token) return;
 
     const retrievePosts = async () => {
@@ -38,7 +38,7 @@ const PostPage = () => {
     };
 
     retrievePosts();
-  }, []);
+  }, [user?.accessToken]);
 
   const handlePostStatusChange = (postId, newStatus) => {
     setPosts((prev) =>
@@ -54,7 +54,6 @@ const PostPage = () => {
           <button type="button" onClick={() => navigate("/posts/addEditPost")} className={styles.addButton}>
             Aggiungi Post
           </button>
-
         </div>
 
         <div className={styles.tabsWrap}>

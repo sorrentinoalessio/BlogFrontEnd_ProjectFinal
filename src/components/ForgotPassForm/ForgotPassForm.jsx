@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import styles from "../ForgotPassForm/ForgotPassForm.module.css";
 import { forgotPassword } from "../services/forgotPass.service.js";
 import Card from "../Card/Card.jsx";
 import { toast } from "react-toastify";
-import { useNavigate } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 
 
 const ForgotPasswordForm = () => {
@@ -73,6 +73,11 @@ const ForgotPasswordForm = () => {
                 </button>
 
             </form>
+             <div className={styles.links}>
+                        <Link to="/login">login</Link>
+                        <span> | </span>
+                        <Link to="/registration">Registrati</Link>
+                    </div>
         </Card>
     );
 };

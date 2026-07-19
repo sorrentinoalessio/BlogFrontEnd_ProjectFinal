@@ -1,8 +1,11 @@
+import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
+import { userSelectors } from "../../reducers/user.slice";
 
 const ProtectedRoutes = () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const user = useSelector(userSelectors.selectUser);
+
+    if (!user?.accessToken) {
         return <Navigate to="/login" replace />;
     }
 

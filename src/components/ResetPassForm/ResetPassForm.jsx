@@ -105,6 +105,7 @@ const ResetPasswordForm = () => {
                     Reset Password
                 </button>
             </form>
+           
         </Card>
     );
 };

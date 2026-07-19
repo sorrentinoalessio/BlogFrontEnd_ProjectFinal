@@ -2,12 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../../Card/Card.jsx";
 import styles from "./AddEditPost.module.css";
+import { useSelector } from "react-redux";
+import { userSelectors } from "../../../reducers/user.slice"; // adatta il path
 
 import { createPost } from "../../services/addPost.service.js";
 import { toast } from "react-toastify";
 
 const AddEditPost = () => {
     const navigate = useNavigate();
+    const user = useSelector(userSelectors.selectUser);
 
     const [form, setForm] = useState({
         title: "",
@@ -65,7 +68,7 @@ const AddEditPost = () => {
         console.log("PAYLOAD", payload);
 
         try {
-            await createPost(payload);
+            await createPost(payload, user?.accessToken);
             toast.success("Post creato con successo");
             navigate("/posts");
         } catch (err) {

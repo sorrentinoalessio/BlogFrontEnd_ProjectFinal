@@ -7,6 +7,7 @@ import PostPage from './components/Posts/PostPage/PostPage.jsx'
 import AddEditPost from './components/Posts/AddEditPost/AddEditPost.jsx'
 import ForgotPasswordForm from './components/ForgotPassForm/ForgotPassForm.jsx'
 import ResetPasswordForm from './components/ResetPassForm/ResetPassForm.jsx'
+import ProfileUserPage from './components/ProfileUserPage/ProfileUserPage.jsx'
 
 export const routes = [
   {
@@ -19,7 +20,8 @@ export const routes = [
         element: <ProtectedRoutes />,
         children: [
           { path: 'posts', element: <PostPage /> },
-          { path: 'posts/addEditPost', element: <AddEditPost /> }
+          { path: 'posts/addEditPost', element: <AddEditPost /> },
+          { path: 'profile', element: <ProfileUserPage /> }
         ]
       },
       { path: "login", element: <LoginForm /> },

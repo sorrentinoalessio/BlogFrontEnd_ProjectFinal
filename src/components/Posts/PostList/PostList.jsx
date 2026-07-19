@@ -23,7 +23,7 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
     );
 
     try {
-      await updatePostStatus(postId, { status: newStatus });
+      await updatePostStatus(postId, { status: newStatus }, user?.accessToken);
       onPostStatusChange?.(postId, newStatus); // <- aggiorna anche stato in PostPage
       toast.success("Stato aggiornato");
     } catch (err) {

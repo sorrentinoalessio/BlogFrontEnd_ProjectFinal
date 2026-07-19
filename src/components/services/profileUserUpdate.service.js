@@ -1,15 +1,16 @@
-export const updatePostStatus = async (postId, payload, token) => {
-  if (!token) throw new Error("Utente non autenticato");
+export const profileUserUpdate = async (token, payload) => {
+  const cleanToken = token?.replace(/^['"]|['"]$/g, "");
+  if (!cleanToken) throw new Error("Utente non autenticato");
 
   const response = await fetch(
-    `http://127.0.0.1:3001/user/post/update/${postId}`,
+    `http://127.0.0.1:3001/user/profile/update`,
     {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${cleanToken}`,
       },
-      body: JSON.stringify(payload), // es: { status: "public" }
+      body: JSON.stringify(payload),
     }
   );
 

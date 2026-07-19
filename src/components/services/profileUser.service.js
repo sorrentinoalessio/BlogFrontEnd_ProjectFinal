@@ -1,13 +1,13 @@
-export const createPost = async (postData, token) => {
-  if (!token) throw new Error("Utente non autenticato");
+export const getProfile = async (token) => {
+  const cleanToken = token?.replace(/^['"]|['"]$/g, "");
 
-  const response = await fetch("http://127.0.0.1:3001/user/post/create", {
-    method: "POST",
+  const response = await fetch("http://127.0.0.1:3001/user/profile", {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${cleanToken}`,
     },
-    body: JSON.stringify(postData),
+    
   });
 
   const contentType = response.headers.get("content-type") || "";
