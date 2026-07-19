@@ -7,6 +7,7 @@ import Loader from "../../Loader/Loader.component";
 import styles from "./PostPage.module.css";
 import { useNavigate } from "react-router-dom";
 import { userSelectors } from "../../../reducers/user.slice"; // adatta il path
+import Card from '../../Card/Card';
 
 const STATUS = [
   { value: "draft", label: "Bozze" },
@@ -47,6 +48,7 @@ const PostPage = () => {
   };
 
   return (
+    <Card>
     <div className={styles.page}>
       <section className={styles.container}>
         <div className={styles.header}>
@@ -75,6 +77,7 @@ const PostPage = () => {
         </div>
       </section>
     </div>
+    </Card>
   );
 };
 

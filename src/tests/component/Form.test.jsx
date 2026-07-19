@@ -2,7 +2,10 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, within, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { configureStore } from '@reduxjs/toolkit'
 import LoginForm from '../../components/LoginForm/LoginForm.component.jsx'
+import { userSlice } from '../../reducers/user.slice.js' // adatta il path
 import { toast } from 'react-toastify'
 
 const navigateMock = vi.fn()
@@ -16,8 +19,15 @@ vi.mock('react-toastify', () => ({ toast: { success: vi.fn(), error: vi.fn() } }
 
 const renderForm = () => {
   const user = userEvent.setup()
-  render(<MemoryRouter><LoginForm /></MemoryRouter>)
-  return { user }
+  const store = configureStore({ reducer: { user: userSlice.reducer } })
+  render(
+    <Provider store={store}>
+      <MemoryRouter>
+        <LoginForm />
+      </MemoryRouter>
+    </Provider>
+  )
+  return { user, store }
 }
 
 describe('LoginForm success', () => {
@@ -26,7 +36,6 @@ describe('LoginForm success', () => {
     expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument()
   })
 
-  
   it('i campi hanno i name corretti', () => {
     renderForm()
     expect(document.querySelector('input[name="email"]')).toBeInTheDocument()
@@ -44,10 +53,10 @@ describe('LoginForm success', () => {
     expect(within(card).getByRole('heading', { name: /login/i })).toBeInTheDocument()
   })
 
-  it('login con successo: toast, token e navigazione', async () => {
+  it('login con successo: toast, dispatch setUser e navigazione', async () => {
     const { signIn } = await import('../../components/services/login.service.js')
-    signIn.mockResolvedValue({ accessToken: 'fake-token' })
-    const { user } = renderForm()
+    signIn.mockResolvedValue({ accessToken: 'fake-token', name: 'Alessio', refreshToken: 'fake-refresh' })
+    const { user, store } = renderForm()
 
     await user.type(screen.getByLabelText(/indirizzo email/i), 'test@example.com')
     await user.type(screen.getByLabelText(/password/i), 'password123')
@@ -55,7 +64,7 @@ describe('LoginForm success', () => {
 
     await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('Login effettuato')
-      expect(localStorage.getItem('token')).toBe('fake-token')
+      expect(store.getState().user.accessToken).toBe('fake-token')
       expect(navigateMock).toHaveBeenCalledWith('/posts')
     })
   })
