@@ -1,0 +1,26 @@
+.form_field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+.success_message {
+    color: green;
+    text-align: center;
+    margin-top: 1rem;
+}
+.errorMessage {
+  color: #dc2626 !important;
+  font-size: 14px;
+  margin-top: 6px;
+  display: block;
+}
