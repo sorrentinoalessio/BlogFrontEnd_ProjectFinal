@@ -7,12 +7,20 @@
 
 .label {
   font-size: 0.95rem;
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 300;
+  color: #0A81B8
 }
 
 .errorMessage {
   margin: 0;
   color: #b91c1c;
   font-size: 0.85rem;
+}
+.submit_button {
+    background-color: #0A81B8;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }

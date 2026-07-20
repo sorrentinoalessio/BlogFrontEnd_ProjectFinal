@@ -105,9 +105,9 @@ const LoginForm = () => {
         !formValue.password.includes(" ");
 
     return (
-        <div className={styles.page}>
-            <Card className="card" title="Login">
+            <Card title="Login">
                 <form className={styles.form} onSubmit={handleSubmit}>
+                    <div className={styles.form_field}>
                     <Input
                         id="email"
                         label="Indirizzo email"
@@ -142,9 +142,9 @@ const LoginForm = () => {
                         <span> | </span>
                         <Link to="/registration">Registrati</Link>
                     </div>
+                    </div>
                 </form>
             </Card>
-        </div>
     );
 };
 

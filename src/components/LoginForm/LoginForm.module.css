@@ -1,3 +1,9 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
 .form_field {
     display: flex;
     flex-direction: column;
@@ -5,6 +11,7 @@
     align-items: flex-start;
     justify-content: flex-start;
     text-align: left;
+    color: #0A81B8;
 }
 
 .input {
@@ -12,15 +19,52 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     width: 100%;
+    background-color: #f9f9f9;
 }
+
 .success_message {
     color: green;
     text-align: center;
     margin-top: 1rem;
 }
+
 .errorMessage {
-  color: #dc2626 !important;
-  font-size: 14px;
-  margin-top: 6px;
-  display: block;
+    color: #dc2626 !important;
+    font-size: 14px;
+    margin-top: 6px;
+    display: block;
+}
+
+.submitButton,
+.submit_button {
+    padding: 10px 14px;
+    background-color: #0A81B8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 600;
+}
+
+.submitButton:hover,
+.submit_button:hover {
+    background-color: #086c98;
+}
+
+.links {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.links a {
+    color: #0A81B8;
+    text-decoration: none;
+}
+
+.links a:hover {
+    text-decoration: underline;
 }
