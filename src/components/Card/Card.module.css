@@ -1,6 +1,7 @@
 .card {
   width: 100%;
   max-width: 720px;
+  min-height: 400px;
   margin-inline: auto;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -19,7 +20,6 @@
 
 .card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
 }
 
 .card h2 {
@@ -44,5 +44,13 @@
   border-radius: 4px;
   cursor: pointer;
 }
-
+.card ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+.card ul li {
+  color: #174d94;
+  margin: 0;
+}
 

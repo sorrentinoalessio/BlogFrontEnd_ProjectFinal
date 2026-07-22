@@ -51,34 +51,32 @@ const PostPage = () => {
 
   return (
     <Card>
-    <div className={styles.page}>
-      <section className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>I tuoi post</h1>
-          <button type="button" onClick={() => navigate("/posts/addEditPost")} className={styles.addButton}>
-            Aggiungi Post
-          </button>
-        </div>
+      <div className={styles.page}>
+        <section className={styles.container}>
+          <div className={styles.header}>
+            <h2 className={styles.title}>Post creati</h2>
 
-        <div className={styles.tabsWrap}>
-          <Tabs>
-            {STATUS.map((s) => (
-              <TabPanel header={s.label} key={s.value}>
-                {!isLoading ? (
-                  <PostList
-                    posts={posts.filter((p) => p.status === s.value)}
-                    user={user}
-                    onPostStatusChange={handlePostStatusChange}
-                  />
-                ) : (
-                  <Loader />
-                )}
-              </TabPanel>
-            ))}
-          </Tabs>
-        </div>
-      </section>
-    </div>
+          </div>
+
+          <div className={styles.tabsWrap}>
+            <Tabs>
+              {STATUS.map((s) => (
+                <TabPanel header={s.label} key={s.value}>
+                  {!isLoading ? (
+                    <PostList
+                      posts={posts.filter((p) => p.status === s.value)}
+                      user={user}
+                      onPostStatusChange={handlePostStatusChange}
+                    />
+                  ) : (
+                    <Loader />
+                  )}
+                </TabPanel>
+              ))}
+            </Tabs>
+          </div>
+        </section>
+      </div>
     </Card>
   );
 };

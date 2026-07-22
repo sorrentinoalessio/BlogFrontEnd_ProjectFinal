@@ -1,0 +1,167 @@
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 30px;
+  box-shadow: 0 16px 36px rgba(17, 24, 39, 0.12);
+  padding: clamp(18px, 4vw, 28px);
+  box-sizing: border-box;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0a81b8;
+  margin: 0 0 0.5rem;
+  
+}
+
+.description {
+  font-size: 1rem;
+  color: #0a81b8;
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.75rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tag {
+  background: #e6f4fa;
+  color: #0a81b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.noTags {
+  font-size: 0.8rem;
+  color: #aaa;
+  font-style: italic;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.statusLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #174d94;
+}
+
+.statusSelect {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  background-color: #f9f9f9;
+  color: #0a81b8;
+  cursor: pointer;
+}
+
+.statusSelect:focus {
+  outline: none;
+  border-color: #0a81b8;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #eee;
+  padding-top: 0.75rem;
+}
+
+.commentsBtn {
+  padding: 10px 20px;
+  background-color: #0a81b8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.commentsBtn:hover {
+  background-color: #086a97;
+}
+
+.likes {
+  font-size: 0.9rem;
+  color: #174d94;
+}
+
+.commentsList {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  background: #f9f9f9;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.commentItem {
+  font-size: 0.9rem;
+  color: #174d94;
+}
+
+.commentItem strong {
+  color: #0a81b8;
+}
+
+.empty {
+  text-align: center;
+  color: #888;
+  font-size: 1rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 600px) {
+  .card {
+    border-radius: 20px;
+  }
+
+  .title {
+    font-size: 1.15rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

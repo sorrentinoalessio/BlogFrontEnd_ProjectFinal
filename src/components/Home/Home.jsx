@@ -1,25 +1,25 @@
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import Card from '../Card/Card';
 import { ThemeContext } from '../../contexts/ThemeProvider';
-import { clearUser, userSelectors } from '../../reducers/user.slice'; // adatta il path
+import PublicPosts from '../Posts/PostPublicList/PostPublicList';
+import { useAuth } from "../../hooks/useAuth";
 
 const Home = () => {
-  const { theme, switchTheme } = useContext(ThemeContext);
+  const { theme, switchTheme } = useContext(ThemeContext); // tieni solo se li usi
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const user = useSelector(userSelectors.selectUser);
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
-    dispatch(clearUser());
+    logout();
     navigate("/login");
   };
 
   return (
-    <Card title="Home">
-      <h4>Post Publicati</h4>
-    </Card>
+
+      <Card title="Post">
+        <PublicPosts />
+      </Card>
   );
 };
 

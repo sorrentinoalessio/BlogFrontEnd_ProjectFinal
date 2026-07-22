@@ -75,6 +75,7 @@ export default function PublicPosts() {
                 <span className={styles.noTags}>Nessun tag</span>
               )}
             </div>
+            <div className={styles.description}><h6>Creato da: {post.ownerName}</h6></div>
           </li>
         ))}
       </ul>

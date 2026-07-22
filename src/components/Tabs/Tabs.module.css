@@ -1,0 +1,52 @@
+/* Tabs.module.css */
+
+.tab-container {
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.tabs-headers {
+    display: flex;
+    justify-content: center; /* raggruppa i tab al centro */
+    list-style: none;
+    margin: 0 0 1.5rem 0;
+    padding: 0;
+    gap: 0.5rem;
+}
+
+.tab-card {
+    /* rimuovi flex: 1; */
+    padding: 0.75rem 1.5rem; /* aumenta un po' il padding orizzontale se vuoi più respiro */
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #d0cccc;
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.tab-card:hover {
+    color: #0A81B8;
+    background-color: #f0f8fb;
+}
+
+.active {
+    color: #0A81B8;
+    border-bottom-color: #0A81B8;
+    font-weight: 600;
+}
+
+.tabs-contents {
+    padding: 0;
+}
+
+@media (max-width: 480px) {
+    .tab-card {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.85rem;
+    }
+}

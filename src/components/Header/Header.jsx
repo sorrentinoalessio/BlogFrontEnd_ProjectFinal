@@ -17,6 +17,14 @@ const Header = () => {
     return (
         <header className={styles.main_header}>
             <h1 className={styles.title}>Blog</h1>
+            <ul>
+                <li><a href="/" className={styles.navBar}> Home</a></li>
+                <li ><a href="/posts" className={styles.navBar}> Posts</a></li>
+                <li><a href="/posts/addEditPost" className={styles.navBar}> Add Post</a></li> 
+                <li><a href="/profile" className={styles.navBar}> Profile</a></li>
+            </ul>
+            <ul>
+            </ul>
 
             <div className={styles.right}>
                 {isLoggedIn ? (
