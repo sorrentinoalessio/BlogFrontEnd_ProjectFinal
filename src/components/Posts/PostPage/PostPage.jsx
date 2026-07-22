@@ -1,12 +1,13 @@
 import { TabPanel, Tabs } from "../../Tabs/Tabs";
 import PostList from "../PostList/PostList";
-import { getPost } from "../../services/post.service";
+import { useSocketEmit } from "../../../socket/useSocketEmit"; // adatta il path
+import { useSocket } from "../../../socket/SocketContext"; // adatta il path
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Loader from "../../Loader/Loader.component";
 import styles from "./PostPage.module.css";
 import { useNavigate } from "react-router-dom";
-import { userSelectors } from "../../../reducers/user.slice"; // adatta il path
+import { userSelectors } from "../../../reducers/user.slice";
 import Card from '../../Card/Card';
 
 const STATUS = [
@@ -21,15 +22,16 @@ const PostPage = () => {
 
   const navigate = useNavigate();
   const user = useSelector(userSelectors.selectUser);
+  const { listPosts } = useSocketEmit();
+  const { connected } = useSocket();
 
   useEffect(() => {
-    const token = user?.accessToken;
-    if (!token) return;
+    if (!connected) return;
 
     const retrievePosts = async () => {
       setIsLoading(true);
       try {
-        const data = await getPost(token);
+        const data = await listPosts();
         setPosts(data);
       } catch (error) {
         console.error("Errore nel recupero dei post:", error);
@@ -39,7 +41,7 @@ const PostPage = () => {
     };
 
     retrievePosts();
-  }, [user?.accessToken]);
+  }, [connected]);
 
   const handlePostStatusChange = (postId, newStatus) => {
     setPosts((prev) =>

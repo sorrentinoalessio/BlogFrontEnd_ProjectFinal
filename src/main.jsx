@@ -9,6 +9,7 @@ import { store, persistor } from './store/store.js';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { SocketProvider } from './socket/SocketProvider.jsx'; // adatta il path
 
 const router = createBrowserRouter(routes);
 
@@ -17,7 +18,7 @@ createRoot(document.getElementById('root')).render(
     <ThemeProvider>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <>
+          <SocketProvider>
             <RouterProvider router={router} />
             <ToastContainer
               position="bottom-center"
@@ -28,7 +29,7 @@ createRoot(document.getElementById('root')).render(
               theme="light"
               style={{ zIndex: 99999 }}
             />
-          </>
+          </SocketProvider>
         </PersistGate>
       </Provider>
     </ThemeProvider>
