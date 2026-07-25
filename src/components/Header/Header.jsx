@@ -20,7 +20,7 @@ const Header = () => {
             <ul>
                 <li><a href="/" className={styles.navBar}> Home</a></li>
                 <li ><a href="/posts" className={styles.navBar}> Posts</a></li>
-                <li><a href="/posts/addEditPost" className={styles.navBar}> Add Post</a></li> 
+                <li><a href="/posts/addPost" className={styles.navBar}> Add Post</a></li> 
                 <li><a href="/profile" className={styles.navBar}> Profile</a></li>
             </ul>
             <ul>

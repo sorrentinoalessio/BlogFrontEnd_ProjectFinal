@@ -1,44 +1,51 @@
 import { toast } from "react-toastify";
 import { updatePostStatus } from "../../services/post.service";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./PostList.module.css";
 
 const STEP = 5;
 
 const PostList = ({ posts = [], user, onPostStatusChange }) => {
-  const [openComments, setOpenComments] = useState({});
-  const [visibleCount, setVisibleCount] = useState(STEP);
-  const [localPosts, setLocalPosts] = useState(posts);
-  const loaderRef = useRef(null);
-
-  useEffect(() => {
-    setLocalPosts(posts);
-  }, [posts]);
-
-  const changeStatus = async (postId, newStatus) => {
-    const oldPosts = localPosts;
-
-    setLocalPosts((prev) =>
-      prev.map((p) => (p._id === postId ? { ...p, status: newStatus } : p))
-    );
-
-    try {
-      await updatePostStatus(postId, { status: newStatus }, user?.accessToken);
-      onPostStatusChange?.(postId, newStatus); // <- aggiorna anche stato in PostPage
-      toast.success("Stato aggiornato");
-    } catch (err) {
-      setLocalPosts(oldPosts);
-      toast.error(err?.message || "Errore aggiornamento stato");
-    }
-  };
-
-  const visiblePosts = useMemo(
-    () => localPosts.slice(0, visibleCount),
-    [localPosts, visibleCount]
-  );
+    const [openComments, setOpenComments] = useState({});
+    const [visibleCount, setVisibleCount] = useState(STEP);
+    const [localPosts, setLocalPosts] = useState(posts);
+    const loaderRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        setVisibleCount(STEP); // reset quando cambia la lista (tab diversa)
+        setLocalPosts(posts);
+    }, [posts]);
+
+    const changeStatus = async (postId, newStatus) => {
+        const oldPosts = localPosts;
+
+        setLocalPosts((prev) =>
+            prev.map((p) => (p._id === postId ? { ...p, status: newStatus } : p))
+        );
+
+        try {
+            await updatePostStatus(postId, { status: newStatus }, user?.accessToken);
+            onPostStatusChange?.(postId, newStatus);
+            toast.success("Stato aggiornato");
+        } catch (err) {
+            setLocalPosts(oldPosts);
+            toast.error(err?.message || "Errore aggiornamento stato");
+        }
+    };
+
+    // naviga alla pagina di edit passando l'intero oggetto post
+    const goToEditPost = (post) => {
+        navigate(`/posts/editPost/${post._id}`, { state: { post } });
+    };
+
+    const visiblePosts = useMemo(
+        () => localPosts.slice(0, visibleCount),
+        [localPosts, visibleCount]
+    );
+
+    useEffect(() => {
+        setVisibleCount(STEP);
     }, [posts]);
 
     useEffect(() => {
@@ -48,7 +55,7 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    setVisibleCount((prev) => Math.min(prev + 1, posts.length)); // uno alla volta
+                    setVisibleCount((prev) => Math.min(prev + 1, posts.length));
                 }
             },
             { root: null, rootMargin: "120px", threshold: 0.1 }
@@ -66,7 +73,6 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
 
     return (
         <>
-       
             <ul className={styles.list}>
                 {visiblePosts.map((post) => {
                     const comments = post.comments ?? [];
@@ -98,7 +104,8 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                     <span className={styles.noTags}>Nessun tag</span>
                                 )}
                             </div>
-                                                            <div className={styles.statusRow}>
+
+                            <div className={styles.statusRow}>
                                 <label htmlFor={`status-${post._id}`} className={styles.statusLabel}>
                                     Stato
                                 </label>
@@ -112,6 +119,27 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                     <option value="public">Pubblicato</option>
                                     <option value="archived">Archiviato</option>
                                 </select>
+                            </div>
+
+                              <div className={styles.editPost}>
+                                <label htmlFor={`post-${post._id}`} className={styles.editLabel}>
+                                </label>
+                                <button
+                                    id={`post-${post._id}`}
+                                    type="button"
+                                    className={styles.editBtn}
+                                    onClick={() => goToEditPost(post)}
+                                >
+                                    Edit
+                                </button>
+                            </div>
+                            <div className={styles.meta}>
+                                <span>
+                                    Modificato il:{" "}
+                                    {post.updatedAt
+                                        ? new Date(post.updatedAt).toLocaleDateString("it-IT")
+                                        : "-"}
+                                </span>
                             </div>
 
                             <div className={styles.actions}>

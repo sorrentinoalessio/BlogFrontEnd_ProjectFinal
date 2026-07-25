@@ -4,10 +4,11 @@ import RegistrationForm from './components/RegistrationForm/RegistrationForm.jsx
 import Home from './components/Home/Home.jsx'
 import ProtectedRoutes from './components/ProtectedRoutes/ProtectedRoutes.jsx'
 import PostPage from './components/Posts/PostPage/PostPage.jsx'
-import AddEditPost from './components/Posts/AddEditPost/AddEditPost.jsx'
+import AddPost from './components/Posts/AddPost/AddPost.jsx'
 import ForgotPasswordForm from './components/ForgotPassForm/ForgotPassForm.jsx'
 import ResetPasswordForm from './components/ResetPassForm/ResetPassForm.jsx'
 import ProfileUserPage from './components/ProfileUserPage/ProfileUserPage.jsx'
+import EditPost from './components/Posts/EditPost/EditPost.jsx'
 
 export const routes = [
   {
@@ -20,8 +21,9 @@ export const routes = [
         element: <ProtectedRoutes />,
         children: [
           { path: 'posts', element: <PostPage /> },
-          { path: 'posts/addEditPost', element: <AddEditPost /> },
-          { path: 'profile', element: <ProfileUserPage /> }
+          { path: 'posts/addPost', element: <AddPost /> },
+          { path: 'profile', element: <ProfileUserPage /> },
+          { path: 'posts/editPost/:id', element: <EditPost /> }
         ]
       },
       { path: "login", element: <LoginForm /> },

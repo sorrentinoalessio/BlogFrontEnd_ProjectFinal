@@ -29,6 +29,7 @@
   font-weight: 600;
   color: #0a81b8;
   margin: 0 0 0.5rem;
+  
 }
 
 .description {
@@ -102,13 +103,28 @@
   padding-top: 0.75rem;
 }
 
-.commentsBtn {
+.editBtn {
   padding: 10px 20px;
   background-color: #0a81b8;
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.editBtn:hover {
+  background-color: #086a97;
+}
+
+.commentsBtn {
+  padding: 10px 10px;
+  background-color: #73c0e4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.6rem;
   font-weight: 600;
   cursor: pointer;
 }
