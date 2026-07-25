@@ -19,11 +19,9 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
 
     const changeStatus = async (postId, newStatus) => {
         const oldPosts = localPosts;
-
         setLocalPosts((prev) =>
             prev.map((p) => (p._id === postId ? { ...p, status: newStatus } : p))
         );
-
         try {
             await updatePostStatus(postId, { status: newStatus }, user?.accessToken);
             onPostStatusChange?.(postId, newStatus);
@@ -34,7 +32,6 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
         }
     };
 
-    // naviga alla pagina di edit passando l'intero oggetto post
     const goToEditPost = (post) => {
         navigate(`/posts/editPost/${post._id}`, { state: { post } });
     };
@@ -51,7 +48,6 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
     useEffect(() => {
         const target = loaderRef.current;
         if (!target) return;
-
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
@@ -60,7 +56,6 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
             },
             { root: null, rootMargin: "120px", threshold: 0.1 }
         );
-
         observer.observe(target);
         return () => observer.disconnect();
     }, [posts.length]);
@@ -76,7 +71,10 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
             <ul className={styles.list}>
                 {visiblePosts.map((post) => {
                     const comments = post.comments ?? [];
-                    const likesCount = Array.isArray(post.likes) ? post.likes.length : post.likesCount ?? 0;
+                    // likesCount calcolato dall'array likes oppure dal campo likesCount
+                    const likesCount = Array.isArray(post.likes)
+                        ? post.likes.length
+                        : post.likesCount ?? 0;
                     const isOpen = !!openComments[post._id];
 
                     return (
@@ -121,9 +119,8 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                 </select>
                             </div>
 
-                              <div className={styles.editPost}>
-                                <label htmlFor={`post-${post._id}`} className={styles.editLabel}>
-                                </label>
+                            <div className={styles.editPost}>
+                                <label htmlFor={`post-${post._id}`} className={styles.editLabel} />
                                 <button
                                     id={`post-${post._id}`}
                                     type="button"
@@ -133,6 +130,7 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                     Edit
                                 </button>
                             </div>
+
                             <div className={styles.meta}>
                                 <span>
                                     Modificato il:{" "}
@@ -142,24 +140,33 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                 </span>
                             </div>
 
+                            {/* ── Azioni: like (sola lettura) + toggle commenti ── */}
                             <div className={styles.actions}>
+                                <span className={styles.likes}>❤️ {likesCount}</span>
+
                                 <button
                                     type="button"
                                     className={styles.commentsBtn}
                                     onClick={() => toggleComments(post._id)}
                                 >
-                                    {isOpen ? "Nascondi commenti" : `Commenti (${comments.length})`}
+                                    {isOpen
+                                        ? "Nascondi commenti"
+                                        : `💬 Commenti (${comments.length})`}
                                 </button>
-
-                                <span className={styles.likes}>❤️ {likesCount}</span>
                             </div>
 
+                            {/* ── Lista commenti ── */}
                             {isOpen && (
                                 <ul className={styles.commentsList}>
                                     {comments.length ? (
                                         comments.map((c, i) => (
                                             <li key={c._id || i} className={styles.commentItem}>
-                                                <strong>{c.author?.name || c.author || "Utente"}:</strong> {c.text || c.content}
+                                                {/* authorName viene dal backend dopo le modifiche a getPostsStatus */}
+                                                <strong className={styles.commentAuthor}>
+                                                    {c.authorName ?? c.author?.name ?? "Utente"}:
+                                                </strong>{" "}
+                                                {/* il campo si chiama "comment" nel commentSchema */}
+                                                {c.comment ?? c.text ?? c.content}
                                             </li>
                                         ))
                                     ) : (

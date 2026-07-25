@@ -165,3 +165,177 @@
     gap: 0.5rem;
   }
 }
+
+/* ── Da aggiungere al tuo PostPublicList.module.css esistente ── */
+
+/* Autore */
+.author {
+  font-size: 0.78rem;
+  color: var(--color-muted, #888);
+  margin-bottom: 0.75rem;
+}
+
+/* Riga azioni (like + commenti) */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Bottone like */
+.likeBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  color: inherit;
+}
+.likeBtn:hover:not(:disabled) {
+  background: #fff0f0;
+  border-color: #e57373;
+}
+.likeBtn.liked {
+  border-color: #e53935;
+  color: #e53935;
+}
+.likeBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Bottone commenti */
+.commentsBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  color: inherit;
+}
+.commentsBtn:hover {
+  background: #f0f4ff;
+  border-color: #0A81B8;
+}
+
+/* Pannello commenti */
+.commentsPanel {
+  margin-top: 0.75rem;
+  border-top: 1px solid #eee;
+  padding-top: 0.75rem;
+}
+
+/* Form aggiunta commento */
+.addComment {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.commentInput {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.commentInput:focus {
+  border-color: #0A81B8;
+}
+.sendBtn {
+  background: #0A81B8;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sendBtn:hover:not(:disabled) {
+  background: #086a98;
+}
+.sendBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Hint login */
+.loginHint {
+  font-size: 0.82rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+/* Lista commenti */
+.commentsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.commentItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+}
+.commentBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  flex: 1;
+}
+.commentAuthor {
+  font-size: 0.8rem;
+  color: #0A81B8;
+}
+.commentText {
+  color: #333;
+}
+
+/* Bottone elimina commento */
+.deleteCommentBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.1rem 0.3rem;
+  opacity: 0.5;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.deleteCommentBtn:hover {
+  opacity: 1;
+}
+.commentActions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+.editCommentBtn,
+.saveCommentBtn,
+.cancelCommentBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.1rem 0.3rem;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.editCommentBtn:hover,
+.saveCommentBtn:hover,
+.cancelCommentBtn:hover {
+  opacity: 1;
+}
