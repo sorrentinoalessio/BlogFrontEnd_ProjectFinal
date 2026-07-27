@@ -50,7 +50,7 @@ const PostPage = () => {
   };
 
   return (
-    <Card>
+
       <div className={styles.page}>
         <section className={styles.container}>
           <div className={styles.header}>
@@ -77,7 +77,7 @@ const PostPage = () => {
           </div>
         </section>
       </div>
-    </Card>
+
   );
 };
 

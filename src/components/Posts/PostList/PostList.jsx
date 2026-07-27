@@ -76,10 +76,29 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                         ? post.likes.length
                         : post.likesCount ?? 0;
                     const isOpen = !!openComments[post._id];
-
+                    const statusClass =
+                        post.status === "draft"
+                            ? styles.statusDraft
+                            : post.status === "archived"
+                                ? styles.statusArchived
+                                : styles.statusPublic;
                     return (
-                        <li key={post._id} className={styles.card}>
+                        <li
+                            key={post._id}
+                            className={styles.card}
+                            style={{
+                                borderLeftColor:
+                                    post.status === "draft"
+                                        ? "#f59e0b"
+                                        : post.status === "archived"
+                                            ? "#9ca3af"
+                                            : "#22c55e",
+                            }}
+                        >
+                            <p className={styles.name}>Titolo post:</p>
                             <h3 className={styles.title}>{post.title}</h3>
+
+                            <p className={styles.name}>Descrizione post:</p>
                             <p className={styles.description}>{post.description}</p>
 
                             <div className={styles.meta}>
@@ -109,7 +128,7 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                 </label>
                                 <select
                                     id={`status-${post._id}`}
-                                    className={styles.statusSelect}
+                                    className={`${styles.statusSelect} ${statusClass}`}
                                     value={post.status}
                                     onChange={(e) => changeStatus(post._id, e.target.value)}
                                 >
@@ -117,18 +136,6 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                     <option value="public">Pubblicato</option>
                                     <option value="archived">Archiviato</option>
                                 </select>
-                            </div>
-
-                            <div className={styles.editPost}>
-                                <label htmlFor={`post-${post._id}`} className={styles.editLabel} />
-                                <button
-                                    id={`post-${post._id}`}
-                                    type="button"
-                                    className={styles.editBtn}
-                                    onClick={() => goToEditPost(post)}
-                                >
-                                    Edit
-                                </button>
                             </div>
 
                             <div className={styles.meta}>
@@ -140,32 +147,40 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                 </span>
                             </div>
 
-                            {/* ── Azioni: like (sola lettura) + toggle commenti ── */}
+                            {/* ── Azioni: edit + like (sola lettura) + toggle commenti ── */}
                             <div className={styles.actions}>
-                                <span className={styles.likes}>❤️ {likesCount}</span>
-
                                 <button
                                     type="button"
-                                    className={styles.commentsBtn}
-                                    onClick={() => toggleComments(post._id)}
+                                    className={styles.editBtn}
+                                    onClick={() => goToEditPost(post)}
                                 >
-                                    {isOpen
-                                        ? "Nascondi commenti"
-                                        : `💬 Commenti (${comments.length})`}
+                                    Edit
                                 </button>
+
+                                <div className={styles.rightActions}>
+                                    <span className={styles.likes}>❤️ {likesCount}</span>
+
+                                    <button
+                                        type="button"
+                                        className={styles.commentsBtn}
+                                        onClick={() => toggleComments(post._id)}
+                                    >
+                                        {isOpen
+                                            ? "Nascondi commenti"
+                                            : `💬 Commenti (${comments.length})`}
+                                    </button>
+                                </div>
                             </div>
 
-                            {/* ── Lista commenti ── */}
+                            {/* ── Lista commenti, fuori da .actions/.rightActions ── */}
                             {isOpen && (
                                 <ul className={styles.commentsList}>
                                     {comments.length ? (
                                         comments.map((c, i) => (
                                             <li key={c._id || i} className={styles.commentItem}>
-                                                {/* authorName viene dal backend dopo le modifiche a getPostsStatus */}
                                                 <strong className={styles.commentAuthor}>
                                                     {c.authorName ?? c.author?.name ?? "Utente"}:
                                                 </strong>{" "}
-                                                {/* il campo si chiama "comment" nel commentSchema */}
                                                 {c.comment ?? c.text ?? c.content}
                                             </li>
                                         ))

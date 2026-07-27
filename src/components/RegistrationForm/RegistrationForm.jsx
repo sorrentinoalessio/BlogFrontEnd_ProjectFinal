@@ -99,7 +99,7 @@ const RegistrationForm = () => {
                 <div className={styles.form_field}>
                     <Input
                         id="nome"
-                        label="Nome"
+                        label="Nome*"
                         type="text"
                         name="nome"
                         placeholder="Nome"
@@ -111,7 +111,7 @@ const RegistrationForm = () => {
                     />
                     <Input
                         id="email"
-                        label="Indirizzo email"
+                        label="Indirizzo email*"
                         type="text"
                         name="email"
                         placeholder="Email"
@@ -123,7 +123,7 @@ const RegistrationForm = () => {
                     />
                     <Input
                         id="password"
-                        label="Password"
+                        label="Password*"
                         type="password"
                         name="password"
                         placeholder="Password"
@@ -135,7 +135,7 @@ const RegistrationForm = () => {
                     />
                     <Input
                         id="confermaPassword"
-                        label="Conferma password"
+                        label="Conferma password*"
                         type="password"
                         name="confermaPassword"
                         placeholder="Conferma password"

@@ -110,7 +110,7 @@ const LoginForm = () => {
                     <div className={styles.form_field}>
                     <Input
                         id="email"
-                        label="Indirizzo email"
+                        label="Indirizzo email*"
                         type="text"
                         name="email"
                         placeholder="Email"
@@ -122,7 +122,7 @@ const LoginForm = () => {
                     />
                     <Input
                         id="password"
-                        label="Password"
+                        label="Password*"
                         type="password"
                         name="password"
                         placeholder="Password"

@@ -1,7 +1,7 @@
 .card {
   width: 100%;
   max-width: 720px;
-  min-height: 400px;
+  min-height: 50px;
   margin-inline: auto;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -10,9 +10,8 @@
   padding: clamp(18px, 4vw, 28px);
   box-sizing: border-box;
   overflow: hidden;
-  margin-bottom: 15px;
-  margin-top: 15px;
-
+  margin-bottom: 5px;
+  margin-top: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,6 +26,8 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: #0a81b8;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 .input {
   padding: 8px;
@@ -53,4 +54,5 @@
   color: #174d94;
   margin: 0;
 }
+
 

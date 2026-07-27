@@ -19,11 +19,9 @@ const Header = () => {
             <h1 className={styles.title}>Blog</h1>
             <ul>
                 <li><a href="/" className={styles.navBar}> Home</a></li>
-                <li ><a href="/posts" className={styles.navBar}> Posts</a></li>
-                <li><a href="/posts/addPost" className={styles.navBar}> Add Post</a></li> 
+                <li ><a href="/posts" className={styles.navBar}> I tuoi posts</a></li>
+                <li><a href="/posts/addPost" className={styles.navBar}> Aggiungi Post</a></li>
                 <li><a href="/profile" className={styles.navBar}> Profile</a></li>
-            </ul>
-            <ul>
             </ul>
 
             <div className={styles.right}>

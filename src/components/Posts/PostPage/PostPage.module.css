@@ -32,7 +32,11 @@
 .tabsWrap {
   width: 100%;
 }
-
+.name{
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.75rem;
+}
 @media (max-width: 600px) {
   .page {
     padding: 1rem 0.5rem;

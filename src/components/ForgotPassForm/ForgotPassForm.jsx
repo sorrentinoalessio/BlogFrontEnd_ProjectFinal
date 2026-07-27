@@ -80,7 +80,7 @@ const ForgotPasswordForm = () => {
                 </div>
             </form>
             <div className={styles.links}>
-                <Link to="/login">login</Link>
+                <Link to="/login">Login</Link>
                 <span> | </span>
                 <Link to="/registration">Registrati</Link>
             </div>

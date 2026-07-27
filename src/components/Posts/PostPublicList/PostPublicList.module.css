@@ -25,6 +25,7 @@
 }
 
 .title {
+  padding-bottom: 1rem;
   font-size: 1.25rem;
   font-weight: 600;
   color: #0a81b8;
@@ -37,6 +38,12 @@
   color: #0a81b8;
   line-height: 1.6;
   margin: 0 0 1rem;
+}
+
+.name{
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.75rem;
 }
 
 .meta {

@@ -188,9 +188,9 @@ export default function PublicPosts() {
           const isCommenting = loadingAction[postId] === "comment";
 
           return (
-            <li key={postId} className={styles.card}>
-              <h3 className={styles.title}>{post.title}</h3>
-              <p className={styles.description}>{post.description}</p>
+            <li key={postId} >
+              <p className={styles.name}>Titolo post: </p><h3 className={styles.title}>{post.title}</h3>
+              <p className={styles.name}>Descrizione post: </p><p className={styles.description}>{post.description}</p>
 
               <div className={styles.meta}>
                 <span>

@@ -17,7 +17,7 @@ const Home = () => {
 
   return (
 
-      <Card title="Post">
+      <Card title="Post pubblicati">
         <PublicPosts />
       </Card>
   );
