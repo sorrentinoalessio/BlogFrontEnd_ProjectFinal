@@ -188,7 +188,8 @@ export default function PublicPosts() {
           const isCommenting = loadingAction[postId] === "comment";
 
           return (
-            <li key={postId} >
+            <li key={postId} className={styles.card} >
+
               <p className={styles.name}>Titolo post: </p><h3 className={styles.title}>{post.title}</h3>
               <p className={styles.name}>Descrizione post: </p><p className={styles.description}>{post.description}</p>
 
@@ -248,27 +249,37 @@ export default function PublicPosts() {
                   {/* Form aggiunta commento */}
                   {user?.accessToken ? (
                     <div className={styles.addComment}>
-                      <input
+                      <textarea
                         className={styles.commentInput}
-                        type="text"
                         placeholder="Scrivi un commento..."
+                        rows={1}
                         value={commentText[postId] ?? ""}
-                        onChange={(e) =>
-                          setCommentText((prev) => ({ ...prev, [postId]: e.target.value }))
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleAddComment(postId);
+                        onChange={(e) => {
+                          setCommentText((prev) => ({ ...prev, [postId]: e.target.value }));
+                        }}
+                        onInput={(e) => {
+                          // Si attiva a ogni inserimento di testo o riga vuota, regolando l'altezza
+                          e.target.style.height = "auto";
+                          e.target.style.height = `${e.target.scrollHeight}px`;
                         }}
                       />
                       <button
                         type="button"
                         className={styles.sendBtn}
-                        onClick={() => handleAddComment(postId)}
+                        onClick={(e) => {
+                          handleAddComment(postId);
+                          // Trova la textarea e resetta la sua altezza dopo l'invio
+                          const textarea = e.currentTarget.previousElementSibling;
+                          if (textarea) textarea.style.height = "auto";
+                        }}
                         disabled={isCommenting || !(commentText[postId] ?? "").trim()}
                       >
                         {isCommenting ? "..." : "Invia"}
                       </button>
                     </div>
+
+
+
                   ) : (
                     <p className={styles.loginHint}>Accedi per commentare.</p>
                   )}

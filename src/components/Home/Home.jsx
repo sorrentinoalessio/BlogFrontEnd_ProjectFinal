@@ -4,6 +4,7 @@ import Card from '../Card/Card';
 import { ThemeContext } from '../../contexts/ThemeProvider';
 import PublicPosts from '../Posts/PostPublicList/PostPublicList';
 import { useAuth } from "../../hooks/useAuth";
+import styles from './Home.module.css'; // <-- aggiungi il path corretto
 
 const Home = () => {
   const { theme, switchTheme } = useContext(ThemeContext); // tieni solo se li usi
@@ -16,11 +17,15 @@ const Home = () => {
   };
 
   return (
+    <div className={styles.page}>
+      <section className={styles.container}>
+        <div className={styles.header}>
+          <p className={styles.title}>Post publicati</p>
+        </div>
 
-      <Card title="Post pubblicati">
         <PublicPosts />
-      </Card>
+      </section>
+    </div>
   );
-};
-
+}; 
 export default Home;

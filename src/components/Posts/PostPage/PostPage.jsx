@@ -54,7 +54,7 @@ const PostPage = () => {
       <div className={styles.page}>
         <section className={styles.container}>
           <div className={styles.header}>
-            <h2 className={styles.title}>Post creati</h2>
+            <p className={styles.title}>I tuoi posts</p>
 
           </div>
 
