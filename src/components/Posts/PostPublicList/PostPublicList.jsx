@@ -288,11 +288,9 @@ export default function PublicPosts() {
                   <ul className={styles.commentsList}>
                     {comments.length ? (
                       comments.map((c, i) => {
-                        console.log("commento:", c);
-                        console.log("user attuale:", user);
                         const isOwn =
                           user?.userId && c.ownerId?.toString() === user.userId;
-                           console.log("isOwn:", isOwn); 
+                        console.log("isOwn:", isOwn);
                         const isEditing = editingComment[c._id] !== undefined;
 
                         return (
@@ -301,6 +299,17 @@ export default function PublicPosts() {
                               <strong className={styles.commentAuthor}>
                                 {c.authorName ?? c.author?.name ?? "Utente"}
                               </strong>
+                              <span className={styles.commentDate}>
+                                {c.createdAt
+                                  ? new Date(c.createdAt).toLocaleDateString("it-IT", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })
+                                  : "data non disponibile"}
+                              </span>
 
                               {/* testo o input di modifica */}
                               {isEditing ? (
