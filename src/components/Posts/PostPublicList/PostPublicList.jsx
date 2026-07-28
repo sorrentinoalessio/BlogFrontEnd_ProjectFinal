@@ -288,8 +288,11 @@ export default function PublicPosts() {
                   <ul className={styles.commentsList}>
                     {comments.length ? (
                       comments.map((c, i) => {
+                        console.log("commento:", c);
+                        console.log("user attuale:", user);
                         const isOwn =
                           user?.userId && c.ownerId?.toString() === user.userId;
+                           console.log("isOwn:", isOwn); 
                         const isEditing = editingComment[c._id] !== undefined;
 
                         return (

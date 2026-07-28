@@ -2,15 +2,16 @@ export const profileUserUpdate = async (token, payload) => {
   const cleanToken = token?.replace(/^['"]|['"]$/g, "");
   if (!cleanToken) throw new Error("Utente non autenticato");
 
+  const isFormData = payload instanceof FormData;
   const response = await fetch(
     `http://127.0.0.1:3001/user/profile/update`,
     {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         Authorization: `Bearer ${cleanToken}`,
       },
-      body: JSON.stringify(payload),
+      body: isFormData ? payload : JSON.stringify(payload),
     }
   );
 

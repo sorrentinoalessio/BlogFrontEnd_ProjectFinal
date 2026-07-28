@@ -4,6 +4,7 @@ const initialState = {
   name: "",
   accessToken: "",
   refreshToken: "",
+  avatar: "",
 };
 
 export const userSlice = createSlice({
@@ -15,6 +16,7 @@ export const userSlice = createSlice({
       state.userId = action.payload.userId;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
+      state.avatar = action.payload.avatar || state.avatar;
     },
     clearUser: () => {
       return initialState;
