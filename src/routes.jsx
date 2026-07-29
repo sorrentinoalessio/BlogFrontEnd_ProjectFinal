@@ -10,6 +10,7 @@ import ResetPasswordForm from './components/ResetPassForm/ResetPassForm.jsx'
 import ProfileUserPage from './components/ProfileUserPage/ProfileUserPage.jsx'
 import EditPost from './components/Posts/EditPost/EditPost.jsx'
 
+
 export const routes = [
   {
     path: "/",

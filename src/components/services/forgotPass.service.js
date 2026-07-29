@@ -1,6 +1,6 @@
 export const forgotPassword = async (resetData) => {
     try {
-        const response = await fetch('http://127.0.0.1:3001/user/reset_password', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user/reset_password`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

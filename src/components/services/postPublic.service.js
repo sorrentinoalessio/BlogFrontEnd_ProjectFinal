@@ -3,7 +3,7 @@ export const getPostPublic = async () => {
   const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 secondi
 
   try {
-    const response = await fetch("http://127.0.0.1:3001/post/", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/post/`, {
       method: "GET",
       signal: controller.signal,
     });

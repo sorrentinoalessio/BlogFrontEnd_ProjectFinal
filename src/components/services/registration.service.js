@@ -1,6 +1,6 @@
 export const signUp = async (signUpData) => {
     try {
-        const response = await fetch('http://127.0.0.1:3001/user', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

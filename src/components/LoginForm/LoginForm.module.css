@@ -1,17 +1,20 @@
 .form {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 0.75rem;
     padding: 1rem;
+    width: 100%;
 }
 
 .form_field {
     display: flex;
     flex-direction: column;
+    width: 100%;
     margin-bottom: 15px;
-    align-items: flex-start;
-    justify-content: flex-start;
-    text-align: left;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     color: #0A81B8;
 }
 
@@ -47,6 +50,7 @@
     transition: background-color 0.3s ease;
     font-weight: 600;
     font-size: 0.875rem;
+    width: auto;
 }
 
 .submitButton:hover,
@@ -78,6 +82,7 @@
     color: #0A81B8;
     text-decoration: none;
 }
+
 a {
     color: #0A81B8;
     text-decoration: none;

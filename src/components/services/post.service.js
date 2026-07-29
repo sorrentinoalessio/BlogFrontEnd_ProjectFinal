@@ -1,7 +1,7 @@
 export const getPost = async (token) => {
   const cleanToken = token?.replace(/^['"]|['"]$/g, "");
 
-  const response = await fetch("http://127.0.0.1:3001/user/post/", {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/user/post/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -28,7 +28,7 @@ export const updatePostStatus = async (postId, payload, token) => {
   if (!cleanToken) throw new Error("Utente non autenticato");
 
   const response = await fetch(
-    `http://127.0.0.1:3001/user/post/update/${postId}`,
+    `${import.meta.env.VITE_API_URL}/user/post/update/${postId}`,
     {
       method: "PATCH",
       headers: {

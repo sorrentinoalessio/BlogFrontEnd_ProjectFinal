@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./ResetPassForm.module.css";
 import { resetPassword, verifyResetToken } from "../services/resetPass.service.js";
 import Input from "../Input/Input.component.jsx";
@@ -9,7 +9,10 @@ import { useNavigate, useParams } from "react-router-dom";
 const ResetPasswordForm = () => {
     const { token } = useParams();
     const navigate = useNavigate();
+
     const [checkingToken, setCheckingToken] = useState(true);
+    const [tokenValid, setTokenValid] = useState(false);
+    const hasChecked = useRef(false);
 
     const [formValue, setFormValue] = useState({
         password: "",
@@ -21,10 +24,16 @@ const ResetPasswordForm = () => {
     const [serverError, setServerError] = useState("");
 
     useEffect(() => {
+        if (hasChecked.current) return;
+        hasChecked.current = true;
+
         const checkToken = async () => {
             try {
                 await verifyResetToken(token);
                 setCheckingToken(false);
+                setTokenValid(true);
+                toast.success("Link confermato, inserisci la nuova password");
+
             } catch (error) {
                 toast.error("Link non valido o scaduto");
                 navigate("/login", { replace: true });

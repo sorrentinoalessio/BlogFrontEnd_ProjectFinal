@@ -71,7 +71,7 @@ const ProfileUserPage = () => {
 
         if (!filename) return "";
 
-        return `http://127.0.0.1:3001/uploads/${filename}?t=${Date.now()}`;
+        return `${import.meta.env.VITE_API_URL}/uploads/${filename}?t=${Date.now()}`;
     };
 
     useEffect(() => {

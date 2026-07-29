@@ -1,6 +1,6 @@
 export const resetPassword = async ({ passwordNew, token }) => {
     try {
-        const response = await fetch(`http://127.0.0.1:3001/user/new_password/${token}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user/new_password/${token}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ export const resetPassword = async ({ passwordNew, token }) => {
 
 export const verifyResetToken = async (token) => {
     try {
-        const response = await fetch(`http://127.0.0.1:3001/user/reset/${token}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user/reset/${token}`);
         const data = await response.json();
         if (!response.ok) {
             throw new Error(data.message || 'Token non valido');

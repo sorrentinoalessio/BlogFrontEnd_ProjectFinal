@@ -4,7 +4,7 @@ export const profileUserUpdate = async (token, payload) => {
 
   const isFormData = payload instanceof FormData;
   const response = await fetch(
-    `http://127.0.0.1:3001/user/profile/update`,
+    `${import.meta.env.VITE_API_URL}/user/profile/update`,
     {
       method: "PATCH",
       headers: {

@@ -44,9 +44,10 @@ const LoginForm = () => {
     const [serverError, setServerError] = useState("");
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormValue({
             ...formValue,
-            [e.target.name]: e.target.value,
+            [name]: name === "email" ? value.toLowerCase() : value,
         });
     };
 
@@ -121,6 +122,9 @@ const LoginForm = () => {
                         onChange={handleChange}
                         htmlFor="email"
                     />
+                </div>
+
+                <div className={styles.form_field}>
                     <Input
                         id="password"
                         label="Password*"
@@ -133,20 +137,23 @@ const LoginForm = () => {
                         onChange={handleChange}
                         htmlFor="password"
                     />
-                    <button type="submit" className={styles.submitButton} name="login">
-                        <IoLogIn /> LOGIN
-                    </button>
+                </div>
 
-                    {serverError && <small className={styles.errorMessage}>{serverError}</small>}
-                    <div className={styles.RegistrationLink}>
-                        <Link to="/forgot-password">Password dimenticata?</Link>
-                        <span> | </span>
-                        <Link to="/registration">Registrati</Link>
-                    </div>
+                <button type="submit" className={styles.submitButton} name="login">
+                    <IoLogIn /> LOGIN
+                </button>
+
+                {serverError && <small className={styles.errorMessage}>{serverError}</small>}
+
+                <div className={styles.RegistrationLink}>
+                    <Link to="/forgot-password">Password dimenticata?</Link>
+                    <span> | </span>
+                    <Link to="/registration">Registrati</Link>
                 </div>
             </form>
         </Card>
     );
+
 };
 
 export default LoginForm;

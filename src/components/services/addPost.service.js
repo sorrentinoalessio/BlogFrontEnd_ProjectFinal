@@ -1,7 +1,7 @@
 export const createPost = async (postData, token) => {
   if (!token) throw new Error("Utente non autenticato");
 
-  const response = await fetch("http://127.0.0.1:3001/user/post/create", {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/user/post/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
