@@ -22,7 +22,7 @@ describe('signIn', () => {
 
     // Assert
     expect(fetch).toHaveBeenCalledWith( // Controlla che fetch sia stato chiamato con i parametri corretti
-      '${import.meta.env.VITE_API_URL}/user/login',
+      `${import.meta.env.VITE_API_URL}/user/login`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

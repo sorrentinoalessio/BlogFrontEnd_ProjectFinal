@@ -19,7 +19,7 @@ describe('signUp', () => {
 
     // Assert
     expect(fetch).toHaveBeenCalledWith( // Controlla che fetch sia stato chiamato con i parametri corretti
-      '${import.meta.env.VITE_API_URL}/user',
+      `${import.meta.env.VITE_API_URL}/user`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

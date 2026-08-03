@@ -162,6 +162,8 @@
   font-size: 0.88rem;
   padding-bottom: 0.6rem;
   border-bottom: 1px solid #e5e7eb;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .commentItem:last-child {
@@ -201,6 +203,15 @@
     align-items: flex-start;
     gap: 0.5rem;
   }
+
+  .commentItem {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid #e5e7eb;
+}
 }
 
 /* ── Da aggiungere al tuo PostPublicList.module.css esistente ── */
@@ -276,10 +287,14 @@
   margin-top: 0.75rem;
   border-top: 1px solid #eee;
   padding-top: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Form aggiunta commento */
 .addComment {
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   gap: 10px;
   margin-bottom: 0.75rem;
@@ -340,20 +355,26 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
 .commentItem {
-  display: flex;
+  width: 100%;
+  box-sizing: border-box;
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
   font-size: 0.88rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .commentBody {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
@@ -371,6 +392,7 @@
 
 /* Bottone elimina commento */
 .deleteCommentBtn {
+  color: #086a98;
   background: none;
   border: none;
   cursor: pointer;
@@ -389,6 +411,7 @@
   display: flex;
   gap: 0.25rem;
   flex-shrink: 0;
+  margin-left: auto;   /* ← lo spinge sempre a destra */
 }
 
 .editCommentBtn,

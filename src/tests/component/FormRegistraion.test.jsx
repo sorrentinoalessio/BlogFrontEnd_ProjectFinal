@@ -45,10 +45,12 @@ describe('RegitrationForm success', () => {
     const { signUp } = await import('../../components/services/registration.service.js')
     const { user } = renderForm()
 
-    await user.type(screen.getByLabelText(/nome/i), 'Test User')
-    await user.type(screen.getByLabelText(/indirizzo email/i), 'test@example.com')
-    await user.type(screen.getByLabelText(/^Password$/i), 'password123')
-    await user.type(screen.getByLabelText(/^conferma password$/i), 'password123')
+    signUp.mockResolvedValueOnce({ status: 200, message: 'registrazione avvenuta con successo, conferma la tua email' })
+
+    await user.type(screen.getByLabelText(/^Nome\*/i), 'Test User')
+    await user.type(screen.getByLabelText(/^Indirizzo email\*/i), 'test@example.com')
+    await user.type(screen.getByLabelText(/^Password\*/i), 'password123')
+    await user.type(screen.getByLabelText(/^Conferma password\*/i), 'password123')
     await user.click(screen.getByRole('button', { name: /registrati/i }))
 
     expect(screen.getByLabelText(/indirizzo email/i)).toHaveValue('test@example.com')
@@ -80,10 +82,10 @@ describe('RegitrationForm inserimento dati non validi', () => {
     const { signUp } = await import('../../components/services/registration.service.js')
     const { user } = renderForm()
 
-    await user.type(screen.getByLabelText(/^nome$/i), 'Test User')
-    await user.type(screen.getByLabelText(/^indirizzo email$/i), 'testexample.com')
-    await user.type(screen.getByLabelText(/^password$/i), 'password123')
-    await user.type(screen.getByLabelText(/^conferma password$/i), 'password12')
+    await user.type(screen.getByLabelText(/^Nome\*/i), 'Test User')
+    await user.type(screen.getByLabelText(/^Indirizzo email\*/i), 'testexample.com')
+    await user.type(screen.getByLabelText(/^Password\*/i), 'password123')
+    await user.type(screen.getByLabelText(/^Conferma password\*/i), 'password12')
     await user.click(screen.getByRole('button', { name: /registrati/i }))
 
     expect(await screen.findByText(/^email non valida$/i)).toBeInTheDocument()
@@ -92,7 +94,7 @@ describe('RegitrationForm inserimento dati non validi', () => {
 
   it('Password troppo corta', async () => {
     const { user } = renderForm()
-    await user.type(screen.getByLabelText(/^password$/i), 'pass')
+    await user.type(screen.getByLabelText(/^Password\*/i), 'pass')
     await user.click(screen.getByRole('button', { name: /registrati/i }))
     expect(await screen.findByText(/^La password deve essere lunga almeno 6 caratteri$/i)).toBeInTheDocument()
   })
@@ -101,14 +103,14 @@ describe('RegitrationForm inserimento dati non validi', () => {
    signUp.mockRejectedValueOnce(new Error('something went wrong')) // Simula un errore del server
     const { user } = renderForm()
 
-    await user.type(screen.getByLabelText(/nome/i), 'Test User')
-    await user.type(screen.getByLabelText(/indirizzo email/i), 'test@example.com')
-    await user.type(screen.getByLabelText(/^Password$/i), 'password123')
-    await user.type(screen.getByLabelText(/^conferma password$/i), 'password123')
+    await user.type(screen.getByLabelText(/^Nome\*/i), 'Test User')
+    await user.type(screen.getByLabelText(/^Indirizzo email\*/i), 'test@example.com')
+    await user.type(screen.getByLabelText(/^Password\*/i), 'password123')
+    await user.type(screen.getByLabelText(/^Conferma password\*/i), 'password123')
     await user.click(screen.getByRole('button', { name: /registrati/i }))
 
     expect(await screen.findByText(/something went wrong/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/indirizzo email/i)).toHaveValue('test@example.com')
+    expect(screen.getByLabelText(/^Indirizzo email\*/i)).toHaveValue('test@example.com')
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('registrazione fallita')
     })

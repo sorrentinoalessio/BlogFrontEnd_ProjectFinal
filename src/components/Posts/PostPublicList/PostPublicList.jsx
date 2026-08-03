@@ -392,7 +392,7 @@ export default function PublicPosts() {
                                       onClick={() => handleDeleteComment(postId, c._id)}
                                       title="Elimina commento"
                                     >
-                                      🗑
+                                      <p className="{styles.deleteCommentBtn}">elimina</p>
                                     </button>
                                   </>
                                 )}
