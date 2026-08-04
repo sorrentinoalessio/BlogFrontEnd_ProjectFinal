@@ -75,9 +75,15 @@ const ProfileUserPage = () => {
     };
 
     useEffect(() => {
+        if (!user?.accessToken) return undefined;
+
+        let isMounted = true;
+
         const fetchProfile = async () => {
             try {
-                const data = await getProfile(user?.accessToken);
+                const data = await getProfile(user.accessToken);
+                if (!isMounted) return;
+
                 const currentAvatar = resolveAvatarUrl(
                     data?.avatar ||
                     data?.avatarUrl ||
@@ -92,6 +98,7 @@ const ProfileUserPage = () => {
                     user?.avatar ||
                     ""
                 );
+
                 setFormValue((prev) => ({
                     ...prev,
                     nome: data.name || data?.user?.name || prev.nome,
@@ -100,16 +107,21 @@ const ProfileUserPage = () => {
                     avatar: currentAvatar,
                 }));
             } catch (error) {
+                if (!isMounted) return;
                 console.error("Errore nel recupero del profilo:", error);
             }
         };
+
         fetchProfile();
+
+        return () => {
+            isMounted = false;
+        };
     }, [user?.accessToken]);
 
     const handleChange = (e) => {
         setFormValue({ ...formValue, [e.target.name]: e.target.value });
     };
-
     const handleAvatarChange = (e) => {
         const file = e.target.files?.[0] || null;
         if (!file) {
@@ -164,8 +176,10 @@ const ProfileUserPage = () => {
             const avatarToStore = uploadedAvatar || formValue.avatar || user?.avatar || "";
             dispatch(
                 setUser({
-                    ...user,
                     name: formValue.nome,
+                    userId: user?.userId,
+                    accessToken: user?.accessToken,
+                    refreshToken: user?.refreshToken,
                     avatar: avatarToStore,
                 })
             );

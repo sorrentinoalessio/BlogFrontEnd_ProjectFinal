@@ -9,6 +9,7 @@ import ForgotPasswordForm from './components/ForgotPassForm/ForgotPassForm.jsx'
 import ResetPasswordForm from './components/ResetPassForm/ResetPassForm.jsx'
 import ProfileUserPage from './components/ProfileUserPage/ProfileUserPage.jsx'
 import EditPost from './components/Posts/EditPost/EditPost.jsx'
+import PostDetail from './components/Posts/PostDetail/PostDetail.jsx'
 
 
 export const routes = [
@@ -24,7 +25,9 @@ export const routes = [
           { path: 'posts', element: <PostPage /> },
           { path: 'posts/addPost', element: <AddPost /> },
           { path: 'profile', element: <ProfileUserPage /> },
-          { path: 'posts/editPost/:id', element: <EditPost /> }
+          { path: 'posts/editPost/:id', element: <EditPost /> },
+          { path: 'user/post/:id', element: <PostDetail /> }
+
         ]
       },
       { path: "login", element: <LoginForm /> },

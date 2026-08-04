@@ -18,18 +18,16 @@ createRoot(document.getElementById('root')).render(
     <ThemeProvider>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <SocketProvider>
-            <RouterProvider router={router} />
-            <ToastContainer
-              position="bottom-center"
-              autoClose={2500}
-              newestOnTop
-              closeOnClick
-              pauseOnHover
-              theme="light"
-              style={{ zIndex: 99999 }}
-            />
-          </SocketProvider>
+          <RouterProvider router={router} />
+          <ToastContainer
+            position="bottom-center"
+            autoClose={2500}
+            newestOnTop
+            closeOnClick
+            pauseOnHover
+            theme="light"
+            style={{ zIndex: 99999 }}
+          />
         </PersistGate>
       </Provider>
     </ThemeProvider>
