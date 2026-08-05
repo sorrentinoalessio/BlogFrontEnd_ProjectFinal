@@ -50,7 +50,7 @@ const EditPost = () => {
             tagText: Array.isArray(post.tag)
                 ? post.tag.map((t) => (typeof t === "string" ? t : t.tag)).join(", ")
                 : "",
-            imagePost: existingImageUrl,
+            imagePost: "",
             uploadedFile: null,
         });
         setPreviewImage(normalizedImageUrl);
