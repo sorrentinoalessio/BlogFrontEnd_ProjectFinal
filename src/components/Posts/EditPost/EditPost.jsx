@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { userSelectors } from "../../../reducers/user.slice.js"; // adatta il path
 import { editPost } from "../../services/editPost.service.js"; // adatta se getPostById sta in post.service
 import { toast } from "react-toastify";
-import { getPost } from "../../services/post.service.js"; // adatta il path
+import { getPostDetails } from "../../services/postDetails.service.js";
 
 const normalizeImageUrl = (value) => {
     if (!value) return "";
@@ -57,32 +57,30 @@ const EditPost = () => {
     };
 
     useEffect(() => {
-        const postFromState = location.state?.post;
-
-        if (postFromState) {
-            populateForm(postFromState);
+        if (!id) {
             setLoading(false);
             return;
         }
 
-        // fallback: refresh diretto sull'URL, niente state -> fetch by id
-        if (id) {
-            (async () => {
-                try {
-                    const post = await getPost(id, user?.accessToken);
-                    populateForm(post);
-                } catch (err) {
+        (async () => {
+            try {
+                const data = await getPostDetails(id, user?.accessToken);
+                const post = Array.isArray(data) ? data[0] : data;
+                populateForm(post ?? location.state?.post);
+            } catch (err) {
+                const postFromState = location.state?.post;
+                if (postFromState) {
+                    populateForm(postFromState);
+                } else {
                     toast.error(err?.message || "Errore nel caricamento del post");
                     navigate("/posts");
-                } finally {
-                    setLoading(false);
                 }
-            })();
-        } else {
-            setLoading(false);
-        }
+            } finally {
+                setLoading(false);
+            }
+        })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+    }, [id, user?.accessToken]);
 
     useEffect(() => {
         return () => {
