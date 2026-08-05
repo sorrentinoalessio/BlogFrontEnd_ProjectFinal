@@ -146,6 +146,7 @@ const EditPost = () => {
         try {
             await editPost(id, formData, user?.accessToken);
             toast.success("Post modificato con successo");
+            navigate("/posts", { replace: true });
         } catch (err) {
             toast.error(err?.message || "Errore nella modifica del post");
         }
