@@ -70,6 +70,21 @@
     display: block;
 }
 
+.previewWrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.previewImage {
+    width: 100%;
+    max-width: 280px;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #0A81B8;
+}
+
 .actions {
     display: flex;
     gap: 0.75rem;

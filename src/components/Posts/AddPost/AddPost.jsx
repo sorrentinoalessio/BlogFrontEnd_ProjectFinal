@@ -19,12 +19,20 @@ const AddPost = () => {
         datePost: "",
         tagText: "",
         imagePost: "",
+        uploadedFile: null,
     });
 
     const [errors, setErrors] = useState({});
 
     const onChange = (e) => {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value, files } = e.target;
+
+        if (files && files.length > 0) {
+            setForm((prev) => ({ ...prev, [name]: files[0] }));
+            return;
+        }
+
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const validate = () => {
@@ -58,17 +66,17 @@ const AddPost = () => {
         const { ok, tags } = validate();
         if (!ok) return;
 
-        const payload = {
-            title: form.title.trim(),
-            description: form.description.trim(),
-            status: form.status,
-            tag: form.tagText.split(",").map(t => t.trim()).filter(Boolean),
-            ...(form.imagePost?.trim() ? { imagePost: form.imagePost.trim() } : {}),
-        };
-        console.log("PAYLOAD", payload);
+        const formData = new FormData();
+        formData.append("title", form.title.trim());
+        formData.append("description", form.description.trim());
+        formData.append("status", form.status);
+        formData.append("tag", JSON.stringify(tags));
+        if (form.datePost?.trim()) formData.append("datePost", form.datePost.trim());
+        if (form.imagePost?.trim()) formData.append("imagePost", form.imagePost.trim());
+        if (form.uploadedFile) formData.append("uploadedFile", form.uploadedFile);
 
         try {
-            await createPost(payload, user?.accessToken);
+            await createPost(formData, user?.accessToken);
             toast.success("Post creato con successo");
             navigate("/posts");
         } catch (err) {
@@ -159,6 +167,18 @@ const AddPost = () => {
                             value={form.imagePost}
                             onChange={onChange}
                             placeholder="https://..."
+                        />
+                    </div>
+
+                    <div className={styles.field}>
+                        <label className={styles.label} htmlFor="uploadedFile">Immagine del post</label>
+                        <input
+                            id="uploadedFile"
+                            name="uploadedFile"
+                            className={styles.input}
+                            type="file"
+                            accept="image/*"
+                            onChange={onChange}
                         />
                     </div>
 

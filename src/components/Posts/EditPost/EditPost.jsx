@@ -8,6 +8,13 @@ import { editPost } from "../../services/editPost.service.js"; // adatta se getP
 import { toast } from "react-toastify";
 import { getPost } from "../../services/post.service.js"; // adatta il path
 
+const normalizeImageUrl = (value) => {
+    if (!value) return "";
+    if (/^https?:\/\//i.test(value)) return value;
+    const cleanValue = value.replace(/^\/+/, "");
+    return `${import.meta.env.VITE_API_URL}/${cleanValue}`;
+};
+
 const EditPost = () => {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -21,14 +28,18 @@ const EditPost = () => {
         datePost: "",
         tagText: "",
         imagePost: "",
+        uploadedFile: null,
     });
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(true);
+    const [previewImage, setPreviewImage] = useState("");
 
     // converte il post (dal state di navigazione o dalla fetch) nello shape del form
     const populateForm = (post) => {
         if (!post) return;
+        const existingImageUrl = post.imagePost ?? post.img ?? "";
+        const normalizedImageUrl = normalizeImageUrl(existingImageUrl);
         setForm({
             title: post.title ?? "",
             description: post.description ?? "",
@@ -39,8 +50,10 @@ const EditPost = () => {
             tagText: Array.isArray(post.tag)
                 ? post.tag.map((t) => (typeof t === "string" ? t : t.tag)).join(", ")
                 : "",
-            imagePost: post.imagePost ?? "",
+            imagePost: existingImageUrl,
+            uploadedFile: null,
         });
+        setPreviewImage(normalizedImageUrl);
     };
 
     useEffect(() => {
@@ -71,8 +84,25 @@ const EditPost = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
+    useEffect(() => {
+        return () => {
+            if (previewImage?.startsWith("blob:")) {
+                URL.revokeObjectURL(previewImage);
+            }
+        };
+    }, [previewImage]);
+
     const onChange = (e) => {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value, files } = e.target;
+
+        if (files && files.length > 0) {
+            const selectedFile = files[0];
+            setForm((prev) => ({ ...prev, [name]: selectedFile, imagePost: "" }));
+            setPreviewImage(URL.createObjectURL(selectedFile));
+            return;
+        }
+
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const validate = () => {
@@ -103,23 +133,21 @@ const EditPost = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { ok } = validate();
+        const { ok, tags } = validate();
         if (!ok) return;
 
-        const payload = {
-            title: form.title.trim(),
-            description: form.description.trim(),
-            status: form.status,
-            tag: form.tagText.split(",").map((t) => t.trim()).filter(Boolean),
-            ...(form.imagePost?.trim() ? { imagePost: form.imagePost.trim() } : {}),
-        };
-        console.log("PAYLOAD", payload);
+        const formData = new FormData();
+        formData.append("title", form.title.trim());
+        formData.append("description", form.description.trim());
+        formData.append("status", form.status);
+        formData.append("tag", JSON.stringify(tags));
+        if (form.datePost?.trim()) formData.append("datePost", form.datePost.trim());
+        if (form.imagePost?.trim()) formData.append("imagePost", form.imagePost.trim());
+        if (form.uploadedFile) formData.append("uploadedFile", form.uploadedFile);
 
         try {
-            // adatta alla firma reale del tuo service, es. editPost(id, payload, token)
-            await editPost(id, payload, user?.accessToken);
+            await editPost(id, formData, user?.accessToken);
             toast.success("Post modificato con successo");
-
         } catch (err) {
             toast.error(err?.message || "Errore nella modifica del post");
         }
@@ -201,6 +229,19 @@ const EditPost = () => {
                         {errors.tagText && <small className={styles.error}>{errors.tagText}</small>}
                     </div>
 
+                    {previewImage && (
+                        <div className={styles.previewWrapper}>
+                            <img
+                                className={styles.previewImage}
+                                src={previewImage}
+                                alt="Anteprima immagine del post"
+                                onError={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                }}
+                            />
+                        </div>
+                    )}
+
                     <div className={styles.field}>
                         <label className={styles.label} htmlFor="imagePost">URL immagine (opzionale)</label>
                         <input
@@ -210,6 +251,18 @@ const EditPost = () => {
                             value={form.imagePost}
                             onChange={onChange}
                             placeholder="https://..."
+                        />
+                    </div>
+
+                    <div className={styles.field}>
+                        <label className={styles.label} htmlFor="uploadedFile">Immagine del post</label>
+                        <input
+                            id="uploadedFile"
+                            name="uploadedFile"
+                            className={styles.input}
+                            type="file"
+                            accept="image/*"
+                            onChange={onChange}
                         />
                     </div>
 

@@ -1,13 +1,14 @@
 export const editPost = async (id, postData, token) => {
   if (!token) throw new Error("Utente non autenticato");
 
+  const isFormData = postData instanceof FormData;
   const response = await fetch(`${import.meta.env.VITE_API_URL}/user/post/update/${id}`, {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(postData),
+    body: isFormData ? postData : JSON.stringify(postData),
   });
 
   const contentType = response.headers.get("content-type") || "";
