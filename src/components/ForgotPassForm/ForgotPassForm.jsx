@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "../ForgotPassForm/ForgotPassForm.module.css";
+import styles from "./ForgotPassForm.module.css";
 import { forgotPassword } from "../services/forgotPass.service.js";
 import Input from "../Input/Input.component.jsx";
 import Card from "../Card/Card.jsx";

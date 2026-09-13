@@ -1,4 +1,4 @@
-import { useSocket } from "../socket/SocketContext"; // adatta il path
+import { useSocket } from "./SocketContext"; // adatta il path
 import { actions } from "../components/costants/const";
 
 export const useSocketEmit = () => {
