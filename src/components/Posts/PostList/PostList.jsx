@@ -71,7 +71,6 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
             <ul className={styles.list}>
                 {visiblePosts.map((post) => {
                     const comments = post.comments ?? [];
-                    // likesCount calcolato dall'array likes oppure dal campo likesCount
                     const likesCount = Array.isArray(post.likes)
                         ? post.likes.length
                         : post.likesCount ?? 0;
@@ -82,6 +81,7 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                             : post.status === "archived"
                                 ? styles.statusArchived
                                 : styles.statusPublic;
+
                     return (
                         <li
                             key={post._id}
@@ -95,11 +95,56 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                             : "#22c55e",
                             }}
                         >
-                            <p className={styles.name}>Titolo post:</p>
-                            <h3 className={styles.title}>{post.title}</h3>
+                            <div className={styles.cardImageWrap}>
+                                <img
+                                    className={styles.cardImage}
+                                    src={
+                                        post.imageUrl ||
+                                        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80"
+                                    }
+                                    alt={post.title || "Insegnante di nuoto"}
+                                />
+                                <button type="button" className={styles.favoriteBtn} aria-label="Salva post">
+                                    ♡
+                                </button>
+                            </div>
 
-                            <p className={styles.name}>Descrizione post:</p>
-                            <p className={styles.description}>{post.description}</p>
+                            <div className={styles.cardContent}>
+                                <p className={styles.name}>Titolo post</p>
+                                <h3 className={styles.title}>{post.title}</h3>
+                                <p className={styles.description}>{post.description}</p>
+
+                                <div className={styles.metaRow}>
+                                    <span className={styles.star}>★</span>
+                                    <span className={styles.reviews}>5</span>
+                                    <span className={styles.reviewCount}>(17 commenti)</span>
+                                </div>
+
+                                <div className={styles.teacher}>
+                                    <span className={styles.teacherRole}>{post.ownerName || "Insegnante"}</span>
+                                </div>
+
+                                <div className={styles.priceRow}>
+                                    <span className={styles.price}>{post.price || "40€"}</span>
+                                    <span className={styles.priceSuffix}>/ora</span>
+                                </div>
+                            </div>
+
+                            <div className={styles.statusRow}>
+                                <label htmlFor={`status-${post._id}`} className={styles.statusLabel}>
+                                    Stato
+                                </label>
+                                <select
+                                    id={`status-${post._id}`}
+                                    className={`${styles.statusSelect} ${statusClass}`}
+                                    value={post.status}
+                                    onChange={(e) => changeStatus(post._id, e.target.value)}
+                                >
+                                    <option value="draft">Bozza</option>
+                                    <option value="public">Pubblicato</option>
+                                    <option value="archived">Archiviato</option>
+                                </select>
+                            </div>
 
                             <div className={styles.meta}>
                                 <span>
@@ -122,32 +167,6 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                 )}
                             </div>
 
-                            <div className={styles.statusRow}>
-                                <label htmlFor={`status-${post._id}`} className={styles.statusLabel}>
-                                    Stato
-                                </label>
-                                <select
-                                    id={`status-${post._id}`}
-                                    className={`${styles.statusSelect} ${statusClass}`}
-                                    value={post.status}
-                                    onChange={(e) => changeStatus(post._id, e.target.value)}
-                                >
-                                    <option value="draft">Bozza</option>
-                                    <option value="public">Pubblicato</option>
-                                    <option value="archived">Archiviato</option>
-                                </select>
-                            </div>
-
-                            <div className={styles.meta}>
-                                <span>
-                                    Modificato il:{" "}
-                                    {post.updatedAt
-                                        ? new Date(post.updatedAt).toLocaleDateString("it-IT")
-                                        : "-"}
-                                </span>
-                            </div>
-
-                            {/* ── Azioni: edit + like (sola lettura) + toggle commenti ── */}
                             <div className={styles.actions}>
                                 <button
                                     type="button"
@@ -172,7 +191,6 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                 </div>
                             </div>
 
-                            {/* ── Lista commenti, fuori da .actions/.rightActions ── */}
                             {isOpen && (
                                 <ul className={styles.commentsList}>
                                     {comments.length ? (

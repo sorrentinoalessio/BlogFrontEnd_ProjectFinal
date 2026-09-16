@@ -1,0 +1,56 @@
+.card {
+	width: min(760px, calc(100% - 40px));
+	margin: 48px auto;
+	padding: 32px;
+	border: 1px solid var(--sea-border);
+	border-radius: 28px;
+	background: rgba(248, 255, 255, 0.88);
+	box-shadow: 0 14px 34px rgba(20, 20, 20, 0.07);
+}
+
+.card h2 {
+	margin: 0 0 26px;
+	color: #1d1d1d;
+	font-size: clamp(2rem, 4vw, 3.5rem);
+	line-height: 1;
+	letter-spacing: -0.06em;
+	font-weight: 900;
+}
+
+.card > p {
+	margin: -14px 0 24px;
+	color: var(--sea-text-muted);
+}
+
+.input {
+	width: 100%;
+	border: 1px solid #d8d0c8;
+	border-radius: 12px;
+	background: #fffdfa;
+	color: #242220;
+	padding: 12px 14px;
+	outline: none;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+	border-color: #ee7d72;
+	box-shadow: 0 0 0 3px rgba(238, 125, 114, 0.14);
+}
+
+.inputError {
+	border-color: #c54d48;
+}
+
+.inputSuccess {
+	border-color: #45a36d;
+}
+
+@media (max-width: 640px) {
+	.card {
+		width: min(100% - 24px, 760px);
+		margin: 24px auto;
+		padding: 22px 18px;
+		border-radius: 22px;
+	}
+}

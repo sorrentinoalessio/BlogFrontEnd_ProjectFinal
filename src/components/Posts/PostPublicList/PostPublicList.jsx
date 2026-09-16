@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { getPostPublic } from "../../services/postPublic.service";
 import { useSocketEmit } from "../../../socket/useSocketEmit";
 import styles from "./PostPublicList.module.css";
@@ -14,30 +15,41 @@ export default function PublicPosts() {
   const [commentText, setCommentText] = useState({});
   const [loadingAction, setLoadingAction] = useState({});
   const [editingComment, setEditingComment] = useState({}); // { [commentId]: string }
+  const [activeTab, setActiveTab] = useState("all");
 
   const user = useSelector((state) => state.user);
+  const navigate = useNavigate();
   const { likePost, addComment, deleteComment } = useSocketEmit();
 
   // ── Carica i post ──────────────────────────────────────────────────────────
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const data = await getPostPublic();
-        setPosts(data);
-        const initialLikes = {};
-        data.forEach((p) => {
-          initialLikes[p._id] = {
-            likes: Array.isArray(p.likes) ? p.likes : [],
-            likesCount: p.likesCount ?? (Array.isArray(p.likes) ? p.likes.length : 0),
-          };
-        });
-        setLikesMap(initialLikes);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+   const fetchPosts = async () => {
+  try {
+    const data = await getPostPublic();
+
+    console.log("RISPOSTA getPostPublic:", data);
+    console.log("È un array?", Array.isArray(data));
+
+    setPosts(data);
+
+    const initialLikes = {};
+
+    data.forEach((p) => {
+      initialLikes[p._id] = {
+        likes: Array.isArray(p.likes) ? p.likes : [],
+        likesCount:
+          p.likesCount ??
+          (Array.isArray(p.likes) ? p.likes.length : 0),
+      };
+    });
+
+    setLikesMap(initialLikes);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
     fetchPosts();
   }, []);
 
@@ -149,6 +161,33 @@ export default function PublicPosts() {
     });
   };
 
+  const openPost = (postId, event) => {
+    if (event.target.closest("button, textarea, input, select, a")) return;
+    navigate(`/user/post/${postId}`);
+  };
+
+  const visiblePosts = useMemo(() => {
+    const sortedPosts = [...posts];
+
+    if (activeTab === "recent") {
+      return sortedPosts.sort(
+        (firstPost, secondPost) =>
+          new Date(secondPost.creationDate || 0) -
+          new Date(firstPost.creationDate || 0)
+      );
+    }
+
+    if (activeTab === "liked") {
+      return sortedPosts.sort(
+        (firstPost, secondPost) =>
+          (likesMap[secondPost._id]?.likesCount ?? secondPost.likesCount ?? secondPost.likes?.length ?? 0) -
+          (likesMap[firstPost._id]?.likesCount ?? firstPost.likesCount ?? firstPost.likes?.length ?? 0)
+      );
+    }
+
+    return sortedPosts;
+  }, [activeTab, likesMap, posts]);
+
   // ── Render ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
@@ -177,8 +216,37 @@ export default function PublicPosts() {
 
   return (
     <section className={styles.page}>
+      <div className={styles.tabs} role="tablist" aria-label="Visualizzazione post">
+        {[
+          { value: "all", label: "Tutti" },
+          { value: "recent", label: "Più recenti" },
+          { value: "liked", label: "Più apprezzati" },
+        ].map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.value}
+            className={`${styles.tab} ${activeTab === tab.value ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab(tab.value)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div className={styles.filters} aria-label="Filtri">
+        <button type="button" className={styles.filterChip}>Tipo di lezione</button>
+        <button type="button" className={styles.filterChip}>Distanza</button>
+        <button type="button" className={styles.filterChip}>Tariffe</button>
+        <button type="button" className={styles.filterChip}>Livelli</button>
+        <button type="button" className={styles.filterChip}>Tempo di risposta</button>
+      </div>
+
+      <p className={styles.resultsLabel}>71 insegnanti disponibili</p>
+
       <ul className={styles.list}>
-        {posts.map((post) => {
+        {visiblePosts.map((post) => {
           const postId = post._id;
           const likeData = likesMap[postId] ?? { likes: [], likesCount: 0 };
           const comments = commentsMap[postId] ?? post.comments ?? [];
@@ -188,34 +256,57 @@ export default function PublicPosts() {
           const isCommenting = loadingAction[postId] === "comment";
 
           return (
-            <li key={postId} className={styles.card} >
-
-              <p className={styles.name}>Titolo post: </p><h3 className={styles.title}>{post.title}</h3>
-              <p className={styles.name}>Descrizione post: </p><p className={styles.description}>{post.description}</p>
-
-              <div className={styles.meta}>
-                <span>
-                  Pubblicato il:{" "}
-                  {post.creationDate
-                    ? new Date(post.creationDate).toLocaleDateString("it-IT")
-                    : "-"}
-                </span>
+            <li
+              key={postId}
+              className={styles.card}
+              onClick={(event) => openPost(postId, event)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  openPost(postId, event);
+                }
+              }}
+              role="link"
+              tabIndex={0}
+            >
+              <div className={styles.cardImageWrap}>
+                <img
+                  className={styles.cardImage}
+                  src={
+                    post.imageUrl ||
+                    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80"
+                  }
+                  alt={post.title || "Insegnante di nuoto"}
+                />
+                <button
+                  type="button"
+                  className={`${styles.favoriteBtn} ${liked ? styles.favoriteActive : ""}`}
+                  onClick={() => handleLike(postId)}
+                  disabled={!user?.accessToken || isLiking}
+                  aria-label={liked ? "Rimuovi like" : "Metti like"}
+                  title={user?.accessToken ? "Metti like" : "Accedi per mettere like"}
+                >
+                  {liked ? "♥" : "♡"}
+                </button>
               </div>
 
-              <div className={styles.tags}>
-                {(post.tag ?? []).length > 0 ? (
-                  (post.tag ?? []).map((t) => (
-                    <span key={t._id} className={styles.tag}>
-                      #{t.tag}
-                    </span>
-                  ))
-                ) : (
-                  <span className={styles.noTags}>Nessun tag</span>
-                )}
-              </div>
+              <div className={styles.cardContent}>
+                <h3 className={styles.title}>{post.ownerName || "Calogero"}</h3>
+                <p className={styles.description}>{post.location || "Vimercate (presenziale)"}</p>
 
-              <div className={styles.author}>
-                <span>Creato da: {post.ownerName ?? "—"}</span>
+                <div className={styles.metaRow}>
+                  <span className={styles.star}>★</span>
+                  <span className={styles.reviews}>5</span>
+                  <span className={styles.reviewCount}>(17 commenti)</span>
+                </div>
+
+                <div className={styles.teacher}> 
+                  <span className={styles.teacherRole}>{post.title || "Istruttore di nuoto"}</span>
+                </div>
+
+                <div className={styles.priceRow}>
+                  <span className={styles.price}>{post.price || "40€"}</span>
+                  <span className={styles.priceSuffix}>/ora</span>
+                </div>
               </div>
 
               {/* ── Azioni ── */}

@@ -19,6 +19,7 @@ export const routes = [
     children: [
 
       { index: true, element: <Home /> },
+      { path: 'user/post/:id', element: <PostDetail /> },
       {
         element: <ProtectedRoutes />,
         children: [
@@ -26,8 +27,6 @@ export const routes = [
           { path: 'posts/addPost', element: <AddPost /> },
           { path: 'profile', element: <ProfileUserPage /> },
           { path: 'posts/editPost/:id', element: <EditPost /> },
-          { path: 'user/post/:id', element: <PostDetail /> }
-
         ]
       },
       { path: "login", element: <LoginForm /> },

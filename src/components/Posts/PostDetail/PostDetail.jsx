@@ -4,6 +4,27 @@ import { useSelector } from "react-redux";
 import { useSocketEmit } from "../../../socket/useSocketEmit";
 import styles from "../PostPublicList/PostPublicList.module.css";
 import { getPostDetails } from "../../services/postDetails.service.js";
+import { getPostPublic } from "../../services/postPublic.service.js";
+
+const SWIMMING_AVATAR =
+    "https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=800&q=85";
+
+const resolveAvatarUrl = (avatar) => {
+    if (!avatar) return "";
+
+    const value = typeof avatar === "string"
+        ? avatar
+        : avatar.avatar || avatar.avatarUrl || avatar.url || avatar.path || "";
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) return "";
+    if (/^(https?:\/\/|data:|blob:)/i.test(trimmedValue)) return trimmedValue;
+
+    const filename = trimmedValue.replace(/\\/g, "/").split("/").filter(Boolean).pop();
+    return filename
+        ? `${import.meta.env.VITE_API_URL}/uploads/${filename}?t=${Date.now()}`
+        : "";
+};
 
 export default function PostDetail() {
     const { id } = useParams(); // legge :id da /user/post/:id
@@ -26,17 +47,23 @@ export default function PostDetail() {
 
         const fetchPosts = async () => {
             try {
-                const data = await getPostDetails(id,user.accessToken);
+                const data = user?.accessToken
+                    ? await getPostDetails(id, user.accessToken)
+                    : (await getPostPublic()).find((post) => String(post._id) === String(id));
+                if (!data) throw new Error("Post pubblico non trovato");
                 const postArray = Array.isArray(data) ? data : [data]; // normalizza a array
                 setPosts(postArray);
                 const initialLikes = {};
+                const initialComments = {};
                 postArray.forEach((p) => {
                     initialLikes[p._id] = {
                         likes: Array.isArray(p.likes) ? p.likes : [],
                         likesCount: p.likesCount ?? (Array.isArray(p.likes) ? p.likes.length : 0),
                     };
+                    initialComments[p._id] = Array.isArray(p.comments) ? p.comments : [];
                 });
                 setLikesMap(initialLikes);
+                setCommentsMap(initialComments);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -44,7 +71,7 @@ export default function PostDetail() {
             }
         };
         fetchPosts();
-    }, [id]);
+    }, [id, user?.accessToken]);
 
     // ── Helper: utente ha già messo like? ─────────────────────────────────────
     const hasLiked = useCallback(
@@ -181,241 +208,240 @@ export default function PostDetail() {
     }
 
     return (
-        <section className={styles.page}>
-            <ul className={styles.list}>
-                {posts.map((post) => {
-                    const postId = post._id;
-                    const likeData = likesMap[postId] ?? { likes: [], likesCount: 0 };
-                    const comments = commentsMap[postId] ?? post.comments ?? [];
-                    const isOpen = !!openComments[postId];
-                    const liked = hasLiked(postId);
-                    const isLiking = loadingAction[postId] === "like";
-                    const isCommenting = loadingAction[postId] === "comment";
+        <section className={styles.singlePostPage}>
+            {posts.map((post) => {
+                const postId = post._id;
+                const comments = commentsMap[postId] ?? post.comments ?? [];
+                const isCommenting = loadingAction[postId] === "comment";
+                const profileCandidates = [
+                    post.user,
+                    post.user?.user,
+                    post.user?.data,
+                    post.userData,
+                    post.profile,
+                    post.data?.user,
+                    post.owner,
+                    post.author,
+                    post.post?.user,
+                    post,
+                ].filter((candidate) => candidate && typeof candidate === "object");
+                const profile = profileCandidates.find(
+                    (candidate) => candidate.name !== undefined || candidate.avatar !== undefined
+                ) ?? {};
+                const levelScore =
+                    profileCandidates.find((candidate) => candidate.levelScore !== undefined)?.levelScore ?? "-";
+                const timeForHundredMeters =
+                    profileCandidates.find((candidate) => candidate.timeForHundredMeters !== undefined)
+                        ?.timeForHundredMeters ?? "-";
+                const publicPostsCount =
+                    post.publicPostsCount ??
+                    profile.publicPostsCount ??
+                    (Array.isArray(profile.posts)
+                        ? profile.posts.filter((profilePost) => profilePost.status === "public").length
+                        : "-");
 
-                    return (
-                        <li key={postId} className={styles.card} >
+                return (
+                    <article key={postId} className={styles.singlePostLayout}>
+                        <div className={styles.mainContent}>
+                            <div className={styles.categoryTag}>Nuoto</div>
 
-                            <p className={styles.name}>Titolo post: </p><h3 className={styles.title}>{post.title}</h3>
-                            <p className={styles.name}>Descrizione post: </p><p className={styles.description}>{post.description}</p>
+                            <h1 className={styles.heroTitle}>
+                                {post.title || "Istruttore di nuoto, laureato Magistrale in \"Scienze e tecniche delle attività motorie preventive e adattate\" propone lezioni di nuoto a tutte le età e i livelli."}
+                            </h1>
 
-                            <div className={styles.meta}>
-                                <span>
-                                    Pubblicato il:{" "}
-                                    {post.creationDate
-                                        ? new Date(post.creationDate).toLocaleDateString("it-IT")
-                                        : "-"}
-                                </span>
+                            <div className={styles.locationBlock}>
+                                <h2 className={styles.locationTitle}>Luogo del corso</h2>
+                                <div className={styles.locationPills}>
+                                    <span className={styles.locationPill}>📍 {post.location || "Presso Calogero: Vimercate"}</span>
+                                    <span className={styles.locationPill}>🏊‍♂️ A casa tua : spostamento fino a 10 km da Vimercate</span>
+                                </div>
                             </div>
 
-                            <div className={styles.tags}>
-                                {(post.tag ?? []).length > 0 ? (
-                                    (post.tag ?? []).map((t) => (
-                                        <span key={t._id} className={styles.tag}>
-                                            #{t.tag}
-                                        </span>
-                                    ))
-                                ) : (
-                                    <span className={styles.noTags}>Nessun tag</span>
-                                )}
+                            <div className={styles.badgeCard}>
+                                <span className={styles.badgeIcon}>✦</span>
+                                <div>
+                                    <strong>Ambasciatore</strong>
+                                    <p>
+                                        È il meglio del meglio degli insegnanti. Qualità del profilo, eccellenza del livello,
+                                        risposta garantita. Calogero organizzerà con cura la tua prima lezione di Nuoto.
+                                    </p>
+                                </div>
                             </div>
 
-                            <div className={styles.author}>
-                                <span>Creato da: {post.ownerName ?? "—"}</span>
+                            <div className={styles.bioSection}>
+                                <h3>Riguardo Calogero</h3>
+                                <p>
+                                    {post.description ||
+                                        "Ho conseguito la laurea Magistrale in \"Scienze e tecniche delle attività motorie preventive e adattate\" presso l'Università degli Studi di Milano ottenendo il massimo dei voti. Durante gli studi ho lavorato in qualità di docente nelle scuole secondarie di secondo grado. Ho svolto successivamente al mio percorso di studi, 6 mesi di tirocinio nel laboratorio di ricerca della mia Università per continuare la mia tesi sperimentale."}
+                                </p>
                             </div>
 
-                            {/* ── Azioni ── */}
-                            <div className={styles.actions}>
-                                <button
-                                    type="button"
-                                    className={`${styles.likeBtn} ${liked ? styles.liked : ""}`}
-                                    onClick={() => handleLike(postId)}
-                                    disabled={!user?.accessToken || isLiking}
-                                    title={
-                                        user?.accessToken
-                                            ? liked ? "Rimuovi like" : "Metti like"
-                                            : "Accedi per mettere like"
-                                    }
-                                >
-                                    {liked ? "❤️" : "🤍"} {likeData.likesCount}
-                                </button>
+                            <div className={styles.offerSection}>
+                                <p className={styles.offerIntro}>Che tu sia un principiante assoluto, un adulto che vuole superare la paura dell'acqua o un semplice desiderio di migliorare la tua tecnica, offro lezioni personalizzate adatte al tuo livello e ai tuoi obiettivi.</p>
 
-                                <button
-                                    type="button"
-                                    className={styles.commentsBtn}
-                                    onClick={() => toggleComments(postId, post.comments)}
-                                >
-                                    {isOpen ? "Nascondi commenti" : `💬 Commenti (${comments.length})`}
-                                </button>
-                            </div>
-
-                            {/* ── Pannello commenti ── */}
-                            {isOpen && (
-                                <div className={styles.commentsPanel}>
-                                    {/* Form aggiunta commento */}
-                                    {user?.accessToken ? (
-                                        <div className={styles.addComment}>
-                                            <textarea
-                                                className={styles.commentInput}
-                                                placeholder="Scrivi un commento..."
-                                                rows={1}
-                                                value={commentText[postId] ?? ""}
-                                                onChange={(e) => {
-                                                    setCommentText((prev) => ({ ...prev, [postId]: e.target.value }));
-                                                }}
-                                                onInput={(e) => {
-                                                    // Si attiva a ogni inserimento di testo o riga vuota, regolando l'altezza
-                                                    e.target.style.height = "auto";
-                                                    e.target.style.height = `${e.target.scrollHeight}px`;
-                                                }}
-                                            />
-                                            <button
-                                                type="button"
-                                                className={styles.sendBtn}
-                                                onClick={(e) => {
-                                                    handleAddComment(postId);
-                                                    // Trova la textarea e resetta la sua altezza dopo l'invio
-                                                    const textarea = e.currentTarget.previousElementSibling;
-                                                    if (textarea) textarea.style.height = "auto";
-                                                }}
-                                                disabled={isCommenting || !(commentText[postId] ?? "").trim()}
-                                            >
-                                                {isCommenting ? "..." : "Invia"}
-                                            </button>
-                                        </div>
-
-
-
-                                    ) : (
-                                        <p className={styles.loginHint}>Accedi per commentare.</p>
-                                    )}
-
-                                    {/* Lista commenti */}
-                                    <ul className={styles.commentsList}>
-                                        {comments.length ? (
-                                            comments.map((c, i) => {
-                                                const isOwn =
-                                                    user?.userId && c.ownerId?.toString() === user.userId;
-                                                console.log("isOwn:", isOwn);
-                                                const isEditing = editingComment[c._id] !== undefined;
-
-                                                return (
-                                                    <li key={c._id ?? i} className={styles.commentItem}>
-                                                        <div className={styles.commentBody}>
-                                                            <strong className={styles.commentAuthor}>
-                                                                {c.authorName ?? c.author?.name ?? "Utente"}
-                                                            </strong>
-                                                            <span className={styles.commentDate}>
-                                                                {c.createdAt
-                                                                    ? new Date(c.createdAt).toLocaleDateString("it-IT", {
-                                                                        day: "2-digit",
-                                                                        month: "2-digit",
-                                                                        year: "numeric",
-                                                                        hour: "2-digit",
-                                                                        minute: "2-digit",
-                                                                    })
-                                                                    : "data non disponibile"}
-                                                            </span>
-
-                                                            {/* testo o input di modifica */}
-                                                            {isEditing ? (
-                                                                <input
-                                                                    className={styles.commentInput}
-                                                                    value={editingComment[c._id]}
-                                                                    onChange={(e) =>
-                                                                        setEditingComment((prev) => ({
-                                                                            ...prev,
-                                                                            [c._id]: e.target.value,
-                                                                        }))
-                                                                    }
-                                                                    onKeyDown={(e) => {
-                                                                        if (e.key === "Enter")
-                                                                            handleEditComment(postId, c._id, c.comment ?? c.text);
-                                                                        if (e.key === "Escape")
-                                                                            setEditingComment((prev) => {
-                                                                                const s = { ...prev };
-                                                                                delete s[c._id];
-                                                                                return s;
-                                                                            });
-                                                                    }}
-                                                                    autoFocus
-                                                                />
-                                                            ) : (
-                                                                <span className={styles.commentText}>
-                                                                    {c.comment ?? c.text ?? c.content}
-                                                                </span>
-                                                            )}
-                                                        </div>
-
-                                                        {/* bottoni azione — solo per i propri commenti */}
-                                                        {isOwn && (
-                                                            <div className={styles.commentActions}>
-                                                                {isEditing ? (
-                                                                    <>
-                                                                        <button
-                                                                            type="button"
-                                                                            className={styles.saveCommentBtn}
-                                                                            onClick={() =>
-                                                                                handleEditComment(postId, c._id, c.comment ?? c.text)
-                                                                            }
-                                                                            title="Salva modifica"
-                                                                        >
-                                                                            ✅
-                                                                        </button>
-                                                                        <button
-                                                                            type="button"
-                                                                            className={styles.cancelCommentBtn}
-                                                                            onClick={() =>
-                                                                                setEditingComment((prev) => {
-                                                                                    const s = { ...prev };
-                                                                                    delete s[c._id];
-                                                                                    return s;
-                                                                                })
-                                                                            }
-                                                                            title="Annulla"
-                                                                        >
-                                                                            ❌
-                                                                        </button>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <button
-                                                                            type="button"
-                                                                            className={styles.editCommentBtn}
-                                                                            onClick={() =>
-                                                                                setEditingComment((prev) => ({
-                                                                                    ...prev,
-                                                                                    [c._id]: c.comment ?? c.text ?? "",
-                                                                                }))
-                                                                            }
-                                                                            title="Modifica commento"
-                                                                        >
-                                                                            ✏️
-                                                                        </button>
-                                                                        <button
-                                                                            type="button"
-                                                                            className={styles.deleteCommentBtn}
-                                                                            onClick={() => handleDeleteComment(postId, c._id)}
-                                                                            title="Elimina commento"
-                                                                        >
-                                                                            <p className="{styles.deleteCommentBtn}">elimina</p>
-                                                                        </button>
-                                                                    </>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </li>
-                                                );
-                                            })
-                                        ) : (
-                                            <li className={styles.commentItem}>Nessun commento ancora.</li>
-                                        )}
+                                <div className={styles.offerListWrap}>
+                                    <h4>Cosa offro:</h4>
+                                    <ul className={styles.offerList}>
+                                        <li>Lezioni individuali o in piccoli gruppi;</li>
+                                        <li>Approccio progressivo e motivante;</li>
+                                        <li>Tecniche efficaci per superare l'insicurezza in acqua;</li>
+                                        <li>Allenamenti tecnici per migliorare stile e resistenza;</li>
+                                        <li>Esperienza con tutte le età: bambini, ragazzi, adulti.</li>
                                     </ul>
                                 </div>
-                            )}
-                        </li>
-                    );
-                })}
-            </ul>
+
+                                <p className={styles.offerClosing}>Con passione, competenza e metodo, ti guiderò passo dopo passo nel tuo percorso in acqua.</p>
+                            </div>
+
+                            <div className={styles.commentsSection}>
+                                <div className={styles.commentsHeader}>
+                                    <h3>Commenti</h3>
+                                    <span className={styles.commentsRating}>★ 5 (17 commenti)</span>
+                                </div>
+
+                                {comments.length ? (
+                                    <ul className={styles.commentsList}>
+                                        {comments.map((c, i) => {
+                                            const isOwn = user?.userId && c.ownerId?.toString() === user.userId;
+                                            const isEditing = editingComment[c._id] !== undefined;
+
+                                            return (
+                                                <li key={c._id ?? i} className={styles.commentItem}>
+                                                    <div className={styles.commentHeader}>
+                                                        <div className={styles.commentUser}>
+                                                            <span className={styles.avatar}>{(c.authorName ?? c.author?.name ?? "U").charAt(0).toUpperCase()}</span>
+                                                            <span className={styles.commentAuthor}>{c.authorName ?? c.author?.name ?? "Utente"}</span>
+                                                        </div>
+                                                        <span className={styles.commentStars}>★ 5</span>
+                                                    </div>
+
+                                                    {isEditing ? (
+                                                        <input
+                                                            className={styles.commentInput}
+                                                            value={editingComment[c._id]}
+                                                            onChange={(e) =>
+                                                                setEditingComment((prev) => ({
+                                                                    ...prev,
+                                                                    [c._id]: e.target.value,
+                                                                }))
+                                                            }
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter")
+                                                                    handleEditComment(postId, c._id, c.comment ?? c.text);
+                                                                if (e.key === "Escape")
+                                                                    setEditingComment((prev) => {
+                                                                        const s = { ...prev };
+                                                                        delete s[c._id];
+                                                                        return s;
+                                                                    });
+                                                            }}
+                                                            autoFocus
+                                                        />
+                                                    ) : (
+                                                        <p className={styles.commentText}>{c.comment ?? c.text ?? c.content}</p>
+                                                    )}
+
+                                                    {isOwn && (
+                                                        <div className={styles.commentActions}>
+                                                            {isEditing ? (
+                                                                <>
+                                                                    <button type="button" className={styles.saveCommentBtn} onClick={() => handleEditComment(postId, c._id, c.comment ?? c.text)}>✅</button>
+                                                                    <button type="button" className={styles.cancelCommentBtn} onClick={() => setEditingComment((prev) => { const s = { ...prev }; delete s[c._id]; return s; })}>❌</button>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <button type="button" className={styles.editCommentBtn} onClick={() => setEditingComment((prev) => ({ ...prev, [c._id]: c.comment ?? c.text ?? "" }))}>✏️</button>
+                                                                    <button type="button" className={styles.deleteCommentBtn} onClick={() => handleDeleteComment(postId, c._id)}>Elimina</button>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                ) : (
+                                    <div className={styles.emptyComments}>Nessun commento ancora.</div>
+                                )}
+
+                                {user?.accessToken ? (
+                                    <div className={styles.addComment}>
+                                        <textarea
+                                            className={styles.commentInput}
+                                            placeholder="Scrivi un commento..."
+                                            rows={1}
+                                            value={commentText[postId] ?? ""}
+                                            onChange={(e) => setCommentText((prev) => ({ ...prev, [postId]: e.target.value }))}
+                                            onInput={(e) => {
+                                                e.target.style.height = "auto";
+                                                e.target.style.height = `${e.target.scrollHeight}px`;
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            className={styles.sendBtn}
+                                            onClick={() => handleAddComment(postId)}
+                                            disabled={isCommenting || !(commentText[postId] ?? "").trim()}
+                                        >
+                                            {isCommenting ? "..." : "Invia"}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <p className={styles.loginHint}>Accedi per commentare.</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <aside className={styles.sidePanel}>
+                            <div className={styles.sideCard}>
+                                <div className={styles.sideHeader}>
+                                    <div className={styles.sideImageWrap}>
+                                        <img
+                                            src={
+                                                resolveAvatarUrl(profile.avatar) ||
+                                                post.imageUrl ||
+                                                SWIMMING_AVATAR
+                                            }
+                                            alt={post.ownerName || profile.name || "Instructor"}
+                                            className={styles.sideImage}
+                                            onError={(event) => {
+                                                event.currentTarget.onerror = null;
+                                                event.currentTarget.src = SWIMMING_AVATAR;
+                                            }}
+                                        />
+                                        <button type="button" className={styles.sideFavorite} aria-label="Salva insegnante">♡</button>
+                                    </div>
+                                    <button type="button" className={styles.shareBtn} aria-label="Condividi">↗</button>
+                                </div>
+
+                                <h2 className={styles.sideName}>{post.ownerName || profile.name || "Calogero"}</h2>
+                                <div className={styles.sideMeta}>
+                                    <span className={styles.sideStar}>★</span>
+                                    <span>5</span>
+                                    <span className={styles.sideMetaText}>(17 commenti)</span>
+                                </div>
+
+                                <div className={styles.sideStats}>
+                                    <div className={styles.sideRow}>
+                                        <span>Level score</span>
+                                        <strong>{levelScore}</strong>
+                                    </div>
+                                    <div className={styles.sideRow}>
+                                        <span>Tempo 100 metri</span>
+                                        <strong>{timeForHundredMeters}</strong>
+                                    </div>
+                                    <div className={styles.sideRow}>
+                                        <span>Post pubblicati</span>
+                                        <strong>{publicPostsCount}</strong>
+                                    </div>
+                                </div>
+
+                                <button type="button" className={styles.contactBtn}>Contattare</button>
+                            </div>
+                        </aside>
+                    </article>
+                );
+            })}
         </section>
     );
 }

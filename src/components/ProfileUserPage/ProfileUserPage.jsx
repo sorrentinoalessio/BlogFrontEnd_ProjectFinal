@@ -10,6 +10,9 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { userSelectors, setUser } from "../../reducers/user.slice";
 
+const DEFAULT_AVATAR =
+    "https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=800&q=85";
+
 const ProfileUserPage = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -17,9 +20,11 @@ const ProfileUserPage = () => {
 
     const [formValue, setFormValue] = useState({
         nome: "",
+        timeForHundredMeters: "",
         status: "",
         avatar: "",
         avatarFile: null,
+        avatarRemoved: false,
     });
 
     const [nomeError, setNomeError] = useState("");
@@ -102,9 +107,12 @@ const ProfileUserPage = () => {
                 setFormValue((prev) => ({
                     ...prev,
                     nome: data.name || data?.user?.name || prev.nome,
+                    timeForHundredMeters:
+                        data.timeForHundredMeters || data?.user?.timeForHundredMeters || prev.timeForHundredMeters,
                     email: data.email || data?.user?.email || prev.email,
                     status: data.status || data?.user?.status || prev.status,
                     avatar: currentAvatar,
+                    avatarRemoved: false,
                 }));
             } catch (error) {
                 if (!isMounted) return;
@@ -132,8 +140,94 @@ const ProfileUserPage = () => {
         setFormValue((prev) => ({
             ...prev,
             avatarFile: file,
+            avatarRemoved: false,
             avatar: URL.createObjectURL(file),
         }));
+    };
+
+    const handleRemoveAvatar = async () => {
+        const confirmed = await new Promise((resolve) => {
+            toast(
+                ({ closeToast }) => (
+                    <div className={styles.avatarConfirm}>
+                        <strong>Sostituire l'immagine?</strong>
+                        <span>Verrà usato l'avatar standard del nuoto.</span>
+                        <div className={styles.avatarConfirmActions}>
+                            <button
+                                type="button"
+                                className={styles.avatarCancelButton}
+                                onClick={() => {
+                                    closeToast();
+                                    resolve(false);
+                                }}
+                            >
+                                Annulla
+                            </button>
+                            <button
+                                type="button"
+                                className={styles.avatarConfirmButton}
+                                onClick={() => {
+                                    closeToast();
+                                    resolve(true);
+                                }}
+                            >
+                                Conferma
+                            </button>
+                        </div>
+                    </div>
+                ),
+                { autoClose: false, closeOnClick: false, closeButton: false }
+            );
+        });
+        if (!confirmed) return;
+
+        setServerError("");
+
+        try {
+            const defaultAvatarResponse = await fetch(DEFAULT_AVATAR);
+            if (!defaultAvatarResponse.ok) {
+                throw new Error("Avatar standard non disponibile");
+            }
+
+            const defaultAvatarBlob = await defaultAvatarResponse.blob();
+            const defaultAvatarFile = new File(
+                [defaultAvatarBlob],
+                "default-swimming-avatar.jpg",
+                { type: defaultAvatarBlob.type || "image/jpeg" }
+            );
+            const uploadResponse = await uploadAvatar(user?.accessToken, defaultAvatarFile);
+            const storedAvatar = resolveAvatarUrl(
+                uploadResponse?.avatar ||
+                uploadResponse?.file?.avatar ||
+                uploadResponse?.file?.path ||
+                uploadResponse?.file?.filename ||
+                uploadResponse?.url ||
+                uploadResponse?.file?.url
+            );
+            if (!storedAvatar) {
+                throw new Error("Avatar standard non salvato");
+            }
+
+            dispatch(
+                setUser({
+                    name: formValue.nome,
+                    userId: user?.userId,
+                    accessToken: user?.accessToken,
+                    refreshToken: user?.refreshToken,
+                    avatar: storedAvatar,
+                })
+            );
+            setFormValue((prev) => ({
+                ...prev,
+                avatar: storedAvatar,
+                avatarFile: null,
+                avatarRemoved: false,
+            }));
+            toast.success("Immagine sostituita con l'avatar standard");
+        } catch (error) {
+            setServerError(error.message);
+            toast.error("Impossibile aggiornare l'immagine");
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -157,6 +251,8 @@ const ProfileUserPage = () => {
         try {
             await profileUserUpdate(user?.accessToken, {
                 name: formValue.nome,
+                timeForHundredMeters: String(formValue.timeForHundredMeters ?? "").trim(),
+                ...(formValue.avatarRemoved ? { avatar: DEFAULT_AVATAR } : {}),
             });
 
             let uploadedAvatar = "";
@@ -173,7 +269,9 @@ const ProfileUserPage = () => {
                 );
             }
 
-            const avatarToStore = uploadedAvatar || formValue.avatar || user?.avatar || "";
+            const avatarToStore = formValue.avatarRemoved
+                ? DEFAULT_AVATAR
+                : uploadedAvatar || formValue.avatar || user?.avatar || "";
             dispatch(
                 setUser({
                     name: formValue.nome,
@@ -183,7 +281,7 @@ const ProfileUserPage = () => {
                     avatar: avatarToStore,
                 })
             );
-            setFormValue((prev) => ({ ...prev, avatar: avatarToStore }));
+            setFormValue((prev) => ({ ...prev, avatar: avatarToStore, avatarRemoved: false }));
 
             toast.success("Profilo aggiornato con successo");
             navigate("/profile");
@@ -211,6 +309,17 @@ const ProfileUserPage = () => {
                         onChange={handleChange}
                         htmlFor="nome"
                     />
+
+                    <Input
+                        id="timeForHundredMeters"
+                        label="Tempo per 100 metri"
+                        type="text"
+                        name="timeForHundredMeters"
+                        placeholder="es. 1:45"
+                        value={formValue.timeForHundredMeters}
+                        onChange={handleChange}
+                    />
+
                     <label className={styles.avatarLabel} htmlFor="avatar">
                         Immagine profilo
                     </label>
@@ -234,6 +343,15 @@ const ProfileUserPage = () => {
                         onChange={handleAvatarChange}
                         className={styles.fileInput}
                     />
+                    {formValue.avatar && (
+                        <button
+                            type="button"
+                            className={styles.removeAvatarButton}
+                            onClick={handleRemoveAvatar}
+                        >
+                            Cancella immagine
+                        </button>
+                    )}
                     <div
                         className={styles.avatarFallback}
                         style={{ display: formValue.avatar ? "none" : "flex" }}

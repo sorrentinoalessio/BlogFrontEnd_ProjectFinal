@@ -3,12 +3,12 @@ export const getPostDetails = async (id,accessToken) => {
   const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 secondi
 
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/user/post/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/post/${id}`, {
       method: "GET",
       signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${accessToken}`, // Assicurati di avere accessToken disponibile nel contesto
-      },
+      headers: accessToken
+        ? { Authorization: `Bearer ${accessToken}` }
+        : {},
     });
 
     const contentType = response.headers.get("content-type") || "";

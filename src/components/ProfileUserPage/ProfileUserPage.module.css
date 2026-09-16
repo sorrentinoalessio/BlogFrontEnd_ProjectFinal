@@ -1,0 +1,141 @@
+.form {
+	width: 100%;
+}
+
+.form_field {
+	display: grid;
+	gap: 16px;
+}
+
+.avatarLabel {
+	margin-top: 6px;
+	color: #292725;
+	font-size: 0.92rem;
+	font-weight: 800;
+}
+
+.avatarPreview,
+.avatarFallback {
+	width: 150px;
+	height: 150px;
+	border-radius: 24px;
+}
+
+.avatarPreview {
+	object-fit: cover;
+	border: 1px solid #e1d9d1;
+	box-shadow: 0 10px 22px rgba(20, 20, 20, 0.1);
+}
+
+.avatarFallback {
+	align-items: center;
+	justify-content: center;
+	border: 1px dashed #d3c9c0;
+	background: #f5efe9;
+	color: #756d66;
+	font-size: 0.9rem;
+}
+
+.fileInput {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #d8d0c8;
+	border-radius: 12px;
+	background: #fffdfa;
+	color: #3f3a36;
+}
+
+.fileInput::file-selector-button {
+	margin-right: 10px;
+	border: 0;
+	border-radius: 9px;
+	padding: 8px 12px;
+	background: #ebe5de;
+	color: #292725;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.removeAvatarButton {
+	width: fit-content;
+	min-height: 38px;
+	padding: 0 13px;
+	border: 1px solid rgba(197, 77, 72, 0.25);
+	border-radius: 10px;
+	background: #fff3f1;
+	color: #c54d48;
+	font-size: 0.88rem;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.removeAvatarButton:hover {
+	background: #ffe7e3;
+}
+
+.avatarConfirm {
+	display: grid;
+	gap: 6px;
+	color: #292725;
+}
+
+.avatarConfirm span {
+	color: #625c56;
+	font-size: 0.88rem;
+}
+
+.avatarConfirmActions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.avatarCancelButton,
+.avatarConfirmButton {
+	border: 0;
+	border-radius: 8px;
+	padding: 7px 10px;
+	font-size: 0.82rem;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.avatarCancelButton {
+	background: #eee9e4;
+	color: #292725;
+}
+
+.avatarConfirmButton {
+	background: #ee6f68;
+	color: #fff;
+}
+
+.submitButton {
+	min-height: 46px;
+	margin-top: 8px;
+	padding: 0 18px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, var(--sea-aqua) 0%, var(--sea-blue) 100%);
+	color: #fff;
+	font-weight: 700;
+	cursor: pointer;
+	box-shadow: 0 12px 20px rgba(238, 111, 104, 0.2);
+	transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.submitButton:hover {
+	transform: translateY(-1px);
+}
+
+.errorMessage {
+	color: #c54d48;
+	font-weight: 600;
+}
+
+@media (max-width: 640px) {
+	.submitButton {
+		width: 100%;
+	}
+}

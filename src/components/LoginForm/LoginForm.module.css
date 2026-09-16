@@ -1,0 +1,49 @@
+.form {
+	display: grid;
+	gap: 18px;
+}
+
+.form_field {
+	display: grid;
+	gap: 16px;
+}
+
+.submitButton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	min-height: 46px;
+	border: 0;
+	border-radius: 12px;
+	background: linear-gradient(135deg, var(--sea-aqua) 0%, var(--sea-blue) 100%);
+	color: #fff;
+	font-weight: 800;
+	cursor: pointer;
+	box-shadow: 0 12px 20px rgba(238, 111, 104, 0.2);
+	transition: transform 0.15s ease;
+}
+
+.submitButton:hover {
+	transform: translateY(-1px);
+}
+
+.errorMessage {
+	color: #c54d48;
+	font-weight: 600;
+}
+
+.RegistrationLink {
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	color: #625c56;
+	font-size: 0.92rem;
+}
+
+.RegistrationLink a {
+	color: #d85f58;
+	font-weight: 700;
+	text-decoration: none;
+}

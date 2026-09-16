@@ -1,0 +1,160 @@
+.page {
+  min-height: 100vh;
+  background: var(--sea-mist);
+}
+
+.container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 28px 28px 64px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.mainColumn {
+  min-width: 0;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.8rem, 4vw, 5.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.07em;
+  font-weight: 900;
+  color: #1d1d1d;
+}
+
+.detailPanel {
+  padding-top: 18px;
+  align-self: start;
+  min-width: 0;
+}
+
+.profileCard {
+  position: sticky;
+  top: 104px;
+  z-index: 2;
+  height: fit-content;
+  background: transparent;
+  border: none;
+  padding: 12px 0 0;
+}
+
+.profileImageWrap {
+  position: relative;
+  width: min(100%, 310px);
+  height: 270px;
+  border-radius: 34px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(19, 19, 19, 0.08);
+  background: #ddd;
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileFavorite {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1d1d1d;
+  font-size: 1.6rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+.profileName {
+  margin: 18px 0 0;
+  font-size: clamp(2.2rem, 2vw, 3.2rem);
+  line-height: 1.08;
+  letter-spacing: -0.06em;
+  font-weight: 800;
+  color: #1f1f1f;
+}
+
+.profileRating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-weight: 700;
+  color: #1f1f1f;
+}
+
+.star {
+  color: #f6c65f;
+  font-size: 1.2rem;
+}
+
+.reviewText {
+  color: #4b4b4b;
+  font-weight: 500;
+}
+
+.detailsList {
+  margin-top: 22px;
+  display: grid;
+  gap: 18px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  font-size: 1.1rem;
+  color: #1d1d1d;
+}
+
+.detailRow strong {
+  font-size: 1.2rem;
+  letter-spacing: -0.04em;
+}
+
+.contactBtn {
+  margin-top: 26px;
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f29688 0%, #ee7f6f 100%);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  padding: 18px 22px;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(238, 127, 111, 0.25);
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .detailPanel {
+    padding-top: 0;
+  }
+
+  .profileCard {
+    position: relative;
+    top: 0;
+    z-index: auto;
+  }
+}
