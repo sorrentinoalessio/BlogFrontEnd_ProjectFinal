@@ -1,12 +1,12 @@
 .page {
   min-height: 100vh;
-  background: var(--sea-mist);
+  background: transparent;
 }
 
 .container {
   max-width: 1360px;
   margin: 0 auto;
-  padding: 28px 28px 64px;
+  padding: 24px 28px 64px;
 }
 
 .layout {
@@ -20,16 +20,16 @@
 }
 
 .header {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .title {
   margin: 0;
-  font-size: clamp(2.8rem, 4vw, 5.2rem);
+  font-size: clamp(2.6rem, 3.6vw, 4.8rem);
   line-height: 1.02;
   letter-spacing: -0.07em;
   font-weight: 900;
-  color: #1d1d1d;
+  color: #0f172a;
 }
 
 .detailPanel {

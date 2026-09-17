@@ -17,14 +17,14 @@ const Footer = () => {
             </span>
             <span>Swimigo</span>
           </Link>
-          <p>Trova qualcuno con cui nuotare</p>
+          <p>Allenati in compagnia</p>
         </div>
 
         <nav className={styles.links} aria-label="Link del footer">
           <Link to="/">Home</Link>
-          <Link to="/posts">Insegnanti</Link>
-          <Link to="/posts/addPost">Pubblica</Link>
-          <Link to="/profile">Profilo</Link>
+          <Link to="/posts">Le mie attività</Link>
+          <Link to="/posts/addPost">Aggiungi Attività</Link>
+          <Link to="/profile">Il mio Profilo</Link>
         </nav>
 
         <div className={styles.waveMark} aria-hidden="true">

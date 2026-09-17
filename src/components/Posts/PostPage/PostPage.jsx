@@ -13,7 +13,7 @@ import Card from '../../Card/Card';
 const STATUS = [
   { value: "draft", label: "Bozze" },
   { value: "public", label: "Pubblicati" },
-  { value: "archived", label: "Archiviate" },
+  { value: "archived", label: "Vecchi" },
 ];
 
 const PostPage = () => {

@@ -1,9 +1,29 @@
 :root {
   font-family: Inter, "Segoe UI", sans-serif;
   line-height: 1.5;
-  font-weight: 400;
-  color: #1d1d1d;
-  background: #f4f4f4;
+  font-weight: 500;
+  font-size: 80%;
+  color: #111827;
+  background: #f5f7fb;
+  --sea-deep: #0f172a;
+  --sea-blue: #2563eb;
+  --sea-aqua: #38bdf8;
+  --sea-mist: #eef7fb;
+  --sea-foam: #f8fbff;
+  --sea-coral: #f97316;
+  --sea-border: rgba(148, 163, 184, 0.35);
+  --sea-text-muted: #475569;
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-bg-strong: rgba(255, 255, 255, 0.96);
+  --card-border: rgba(148, 163, 184, 0.25);
+  --card-shadow: 0 16px 38px rgba(15, 23, 42, 0.07);
+  --card-shadow-hover: 0 20px 42px rgba(15, 23, 42, 0.1);
+  --card-radius: 22px;
+  --card-radius-lg: 28px;
+  --soft-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -12,33 +32,37 @@
 
 * {
   box-sizing: border-box;
-  --sea-deep: #063b4c;
-  --sea-blue: #087ea4;
-  --sea-aqua: #27c3d6;
-  --sea-mist: #e9f7f8;
-  --sea-foam: #f8ffff;
-  --sea-coral: #ef806f;
-  --sea-border: #c7e2e5;
-  --sea-text-muted: #55717a;
 }
 
 html {
-  background: #f4f4f4;
+  background: #f5f7fb;
+  font-size: 80%;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  background: var(--sea-mist);
+  background:
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.08), transparent 24%),
+    var(--sea-mist);
+  color: #111827;
+  font-size: 0.8rem;
 }
 
 button,
 input,
 textarea {
   background: var(--sea-mist);
+  font: inherit;
 }
 
 img {
   max-width: 100%;
   display: block;
+}
+
+a {
+  transition: all 0.2s ease;
 }

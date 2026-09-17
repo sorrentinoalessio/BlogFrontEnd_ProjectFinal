@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useSocketEmit } from "../../../socket/useSocketEmit";
-import styles from "../PostPublicList/PostPublicList.module.css";
+import sharedStyles from "../PostPublicList/PostPublicList.module.css";
+import detailStyles from "./PostDetail.module.css";
 import { getPostDetails } from "../../services/postDetails.service.js";
 import { getPostPublic } from "../../services/postPublic.service.js";
 
@@ -184,8 +185,8 @@ export default function PostDetail() {
     // ── Render ─────────────────────────────────────────────────────────────────
     if (loading) {
         return (
-            <div className={styles.status}>
-                <span className={styles.spinner} />
+            <div className={sharedStyles.status}>
+                <span className={sharedStyles.spinner} />
                 <p>Caricamento post...</p>
             </div>
         );
@@ -193,7 +194,7 @@ export default function PostDetail() {
 
     if (error) {
         return (
-            <div className={`${styles.status} ${styles.statusError}`}>
+            <div className={`${sharedStyles.status} ${sharedStyles.statusError}`}>
                 <p>Errore: {error}</p>
             </div>
         );
@@ -201,14 +202,14 @@ export default function PostDetail() {
 
     if (posts.length === 0) {
         return (
-            <div className={styles.status}>
+            <div className={sharedStyles.status}>
                 <p>Nessun post disponibile.</p>
             </div>
         );
     }
 
     return (
-        <section className={styles.singlePostPage}>
+        <section className={sharedStyles.singlePostPage}>
             {posts.map((post) => {
                 const postId = post._id;
                 const comments = commentsMap[postId] ?? post.comments ?? [];
@@ -241,24 +242,24 @@ export default function PostDetail() {
                         : "-");
 
                 return (
-                    <article key={postId} className={styles.singlePostLayout}>
-                        <div className={styles.mainContent}>
-                            <div className={styles.categoryTag}>Nuoto</div>
+                    <article key={postId} className={sharedStyles.singlePostLayout}>
+                        <div className={sharedStyles.mainContent}>
+                            <div className={sharedStyles.categoryTag}>Nuoto</div>
 
-                            <h1 className={styles.heroTitle}>
+                            <h1 className={sharedStyles.heroTitle}>
                                 {post.title || "Istruttore di nuoto, laureato Magistrale in \"Scienze e tecniche delle attività motorie preventive e adattate\" propone lezioni di nuoto a tutte le età e i livelli."}
                             </h1>
 
-                            <div className={styles.locationBlock}>
-                                <h2 className={styles.locationTitle}>Luogo del corso</h2>
-                                <div className={styles.locationPills}>
-                                    <span className={styles.locationPill}>📍 {post.location || "Presso Calogero: Vimercate"}</span>
-                                    <span className={styles.locationPill}>🏊‍♂️ A casa tua : spostamento fino a 10 km da Vimercate</span>
+                            <div className={sharedStyles.locationBlock}>
+                                <h2 className={sharedStyles.locationTitle}>Luogo del corso</h2>
+                                <div className={sharedStyles.locationPills}>
+                                    <span className={sharedStyles.locationPill}>📍 {post.location || "Presso Calogero: Vimercate"}</span>
+                                    <span className={sharedStyles.locationPill}>🏊‍♂️ A casa tua : spostamento fino a 10 km da Vimercate</span>
                                 </div>
                             </div>
 
-                            <div className={styles.badgeCard}>
-                                <span className={styles.badgeIcon}>✦</span>
+                            <div className={sharedStyles.badgeCard}>
+                                <span className={sharedStyles.badgeIcon}>✦</span>
                                 <div>
                                     <strong>Ambasciatore</strong>
                                     <p>
@@ -268,7 +269,7 @@ export default function PostDetail() {
                                 </div>
                             </div>
 
-                            <div className={styles.bioSection}>
+                            <div className={sharedStyles.bioSection}>
                                 <h3>Riguardo Calogero</h3>
                                 <p>
                                     {post.description ||
@@ -276,12 +277,12 @@ export default function PostDetail() {
                                 </p>
                             </div>
 
-                            <div className={styles.offerSection}>
-                                <p className={styles.offerIntro}>Che tu sia un principiante assoluto, un adulto che vuole superare la paura dell'acqua o un semplice desiderio di migliorare la tua tecnica, offro lezioni personalizzate adatte al tuo livello e ai tuoi obiettivi.</p>
+                            <div className={sharedStyles.offerSection}>
+                                <p className={sharedStyles.offerIntro}>Che tu sia un principiante assoluto, un adulto che vuole superare la paura dell'acqua o un semplice desiderio di migliorare la tua tecnica, offro lezioni personalizzate adatte al tuo livello e ai tuoi obiettivi.</p>
 
-                                <div className={styles.offerListWrap}>
+                                <div className={sharedStyles.offerListWrap}>
                                     <h4>Cosa offro:</h4>
-                                    <ul className={styles.offerList}>
+                                    <ul className={sharedStyles.offerList}>
                                         <li>Lezioni individuali o in piccoli gruppi;</li>
                                         <li>Approccio progressivo e motivante;</li>
                                         <li>Tecniche efficaci per superare l'insicurezza in acqua;</li>
@@ -290,34 +291,34 @@ export default function PostDetail() {
                                     </ul>
                                 </div>
 
-                                <p className={styles.offerClosing}>Con passione, competenza e metodo, ti guiderò passo dopo passo nel tuo percorso in acqua.</p>
+                                <p className={sharedStyles.offerClosing}>Con passione, competenza e metodo, ti guiderò passo dopo passo nel tuo percorso in acqua.</p>
                             </div>
 
-                            <div className={styles.commentsSection}>
-                                <div className={styles.commentsHeader}>
+                            <div className={sharedStyles.commentsSection}>
+                                <div className={sharedStyles.commentsHeader}>
                                     <h3>Commenti</h3>
-                                    <span className={styles.commentsRating}>★ 5 (17 commenti)</span>
+                                    <span className={sharedStyles.commentsRating}>★ 5 (17 commenti)</span>
                                 </div>
 
                                 {comments.length ? (
-                                    <ul className={styles.commentsList}>
+                                    <ul className={sharedStyles.commentsList}>
                                         {comments.map((c, i) => {
                                             const isOwn = user?.userId && c.ownerId?.toString() === user.userId;
                                             const isEditing = editingComment[c._id] !== undefined;
 
                                             return (
-                                                <li key={c._id ?? i} className={styles.commentItem}>
-                                                    <div className={styles.commentHeader}>
-                                                        <div className={styles.commentUser}>
-                                                            <span className={styles.avatar}>{(c.authorName ?? c.author?.name ?? "U").charAt(0).toUpperCase()}</span>
-                                                            <span className={styles.commentAuthor}>{c.authorName ?? c.author?.name ?? "Utente"}</span>
+                                                <li key={c._id ?? i} className={sharedStyles.commentItem}>
+                                                    <div className={sharedStyles.commentHeader}>
+                                                        <div className={sharedStyles.commentUser}>
+                                                            <span className={sharedStyles.avatar}>{(c.authorName ?? c.author?.name ?? "U").charAt(0).toUpperCase()}</span>
+                                                            <span className={sharedStyles.commentAuthor}>{c.authorName ?? c.author?.name ?? "Utente"}</span>
                                                         </div>
-                                                        <span className={styles.commentStars}>★ 5</span>
+                                                        <span className={sharedStyles.commentStars}>★ 5</span>
                                                     </div>
 
                                                     {isEditing ? (
                                                         <input
-                                                            className={styles.commentInput}
+                                                            className={sharedStyles.commentInput}
                                                             value={editingComment[c._id]}
                                                             onChange={(e) =>
                                                                 setEditingComment((prev) => ({
@@ -338,20 +339,20 @@ export default function PostDetail() {
                                                             autoFocus
                                                         />
                                                     ) : (
-                                                        <p className={styles.commentText}>{c.comment ?? c.text ?? c.content}</p>
+                                                        <p className={sharedStyles.commentText}>{c.comment ?? c.text ?? c.content}</p>
                                                     )}
 
                                                     {isOwn && (
-                                                        <div className={styles.commentActions}>
+                                                        <div className={sharedStyles.commentActions}>
                                                             {isEditing ? (
                                                                 <>
-                                                                    <button type="button" className={styles.saveCommentBtn} onClick={() => handleEditComment(postId, c._id, c.comment ?? c.text)}>✅</button>
-                                                                    <button type="button" className={styles.cancelCommentBtn} onClick={() => setEditingComment((prev) => { const s = { ...prev }; delete s[c._id]; return s; })}>❌</button>
+                                                                    <button type="button" className={sharedStyles.saveCommentBtn} onClick={() => handleEditComment(postId, c._id, c.comment ?? c.text)}>✅</button>
+                                                                    <button type="button" className={sharedStyles.cancelCommentBtn} onClick={() => setEditingComment((prev) => { const s = { ...prev }; delete s[c._id]; return s; })}>❌</button>
                                                                 </>
                                                             ) : (
                                                                 <>
-                                                                    <button type="button" className={styles.editCommentBtn} onClick={() => setEditingComment((prev) => ({ ...prev, [c._id]: c.comment ?? c.text ?? "" }))}>✏️</button>
-                                                                    <button type="button" className={styles.deleteCommentBtn} onClick={() => handleDeleteComment(postId, c._id)}>Elimina</button>
+                                                                    <button type="button" className={sharedStyles.editCommentBtn} onClick={() => setEditingComment((prev) => ({ ...prev, [c._id]: c.comment ?? c.text ?? "" }))}>✏️</button>
+                                                                    <button type="button" className={sharedStyles.deleteCommentBtn} onClick={() => handleDeleteComment(postId, c._id)}>Elimina</button>
                                                                 </>
                                                             )}
                                                         </div>
@@ -361,13 +362,13 @@ export default function PostDetail() {
                                         })}
                                     </ul>
                                 ) : (
-                                    <div className={styles.emptyComments}>Nessun commento ancora.</div>
+                                    <div className={sharedStyles.emptyComments}>Nessun commento ancora.</div>
                                 )}
 
                                 {user?.accessToken ? (
-                                    <div className={styles.addComment}>
+                                    <div className={sharedStyles.addComment}>
                                         <textarea
-                                            className={styles.commentInput}
+                                            className={sharedStyles.commentInput}
                                             placeholder="Scrivi un commento..."
                                             rows={1}
                                             value={commentText[postId] ?? ""}
@@ -379,7 +380,7 @@ export default function PostDetail() {
                                         />
                                         <button
                                             type="button"
-                                            className={styles.sendBtn}
+                                            className={sharedStyles.sendBtn}
                                             onClick={() => handleAddComment(postId)}
                                             disabled={isCommenting || !(commentText[postId] ?? "").trim()}
                                         >
@@ -387,15 +388,15 @@ export default function PostDetail() {
                                         </button>
                                     </div>
                                 ) : (
-                                    <p className={styles.loginHint}>Accedi per commentare.</p>
+                                    <p className={sharedStyles.loginHint}>Accedi per commentare.</p>
                                 )}
                             </div>
                         </div>
 
-                        <aside className={styles.sidePanel}>
-                            <div className={styles.sideCard}>
-                                <div className={styles.sideHeader}>
-                                    <div className={styles.sideImageWrap}>
+                        <aside className={detailStyles.sidePanel}>
+                            <div className={detailStyles.sideCard}>
+                                <div className={sharedStyles.sideHeader}>
+                                    <div className={sharedStyles.sideImageWrap}>
                                         <img
                                             src={
                                                 resolveAvatarUrl(profile.avatar) ||
@@ -403,40 +404,40 @@ export default function PostDetail() {
                                                 SWIMMING_AVATAR
                                             }
                                             alt={post.ownerName || profile.name || "Instructor"}
-                                            className={styles.sideImage}
+                                            className={sharedStyles.sideImage}
                                             onError={(event) => {
                                                 event.currentTarget.onerror = null;
                                                 event.currentTarget.src = SWIMMING_AVATAR;
                                             }}
                                         />
-                                        <button type="button" className={styles.sideFavorite} aria-label="Salva insegnante">♡</button>
+                                        <button type="button" className={sharedStyles.sideFavorite} aria-label="Salva insegnante">♡</button>
                                     </div>
-                                    <button type="button" className={styles.shareBtn} aria-label="Condividi">↗</button>
+                                    <button type="button" className={sharedStyles.shareBtn} aria-label="Condividi">↗</button>
                                 </div>
 
-                                <h2 className={styles.sideName}>{post.ownerName || profile.name || "Calogero"}</h2>
-                                <div className={styles.sideMeta}>
-                                    <span className={styles.sideStar}>★</span>
+                                <h2 className={sharedStyles.sideName}>{post.ownerName || profile.name || "Calogero"}</h2>
+                                <div className={sharedStyles.sideMeta}>
+                                    <span className={sharedStyles.sideStar}>★</span>
                                     <span>5</span>
-                                    <span className={styles.sideMetaText}>(17 commenti)</span>
+                                    <span className={sharedStyles.sideMetaText}>(17 commenti)</span>
                                 </div>
 
-                                <div className={styles.sideStats}>
-                                    <div className={styles.sideRow}>
+                                <div className={sharedStyles.sideStats}>
+                                    <div className={sharedStyles.sideRow}>
                                         <span>Level score</span>
                                         <strong>{levelScore}</strong>
                                     </div>
-                                    <div className={styles.sideRow}>
+                                    <div className={sharedStyles.sideRow}>
                                         <span>Tempo 100 metri</span>
                                         <strong>{timeForHundredMeters}</strong>
                                     </div>
-                                    <div className={styles.sideRow}>
+                                    <div className={sharedStyles.sideRow}>
                                         <span>Post pubblicati</span>
                                         <strong>{publicPostsCount}</strong>
                                     </div>
                                 </div>
 
-                                <button type="button" className={styles.contactBtn}>Contattare</button>
+                                <button type="button" className={sharedStyles.contactBtn}>Contattare</button>
                             </div>
                         </aside>
                     </article>

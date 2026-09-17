@@ -2,10 +2,11 @@
 	width: min(760px, calc(100% - 40px));
 	margin: 48px auto;
 	padding: 32px;
-	border: 1px solid var(--sea-border);
-	border-radius: 28px;
-	background: rgba(248, 255, 255, 0.88);
-	box-shadow: 0 14px 34px rgba(20, 20, 20, 0.07);
+	border: 1px solid var(--card-border);
+	border-radius: var(--card-radius-lg);
+	background: linear-gradient(180deg, var(--card-bg-strong) 0%, var(--card-bg) 100%);
+	box-shadow: var(--card-shadow);
+	backdrop-filter: blur(8px);
 }
 
 .card h2 {

@@ -1,50 +1,51 @@
 .mainHeader {
   width: 100%;
-  background: rgba(255, 255, 255, 0.76);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(20, 20, 20, 0.06);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
   position: sticky;
   top: 0;
   z-index: 20;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
 }
 
 .container {
   max-width: 1360px;
   margin: 0 auto;
-  min-height: 84px;
-  padding: 16px 32px;
+  min-height: 76px;
+  padding: 14px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 22px;
+  gap: 20px;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   text-decoration: none;
-  color: #1d1d1d;
+  color: #111827;
 }
 
 .logoIcon {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #7ad4ff 0%, #5a8dff 100%);
+  background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
   color: #ffffff;
   display: grid;
   place-items: center;
-  box-shadow: 0 10px 24px rgba(90, 141, 255, 0.25);
+  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.2);
 }
 
 .logoIcon svg {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
 }
 
 .brandText {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
   font-weight: 900;
   letter-spacing: -0.06em;
   line-height: 1;
@@ -52,12 +53,12 @@
 
 .brandCopy {
   display: grid;
-  gap: 4px;
+  gap: 3px;
 }
 
 .brandTagline {
-  color: #55717a;
-  font-size: 0.72rem;
+  color: #475569;
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0;
   line-height: 1.1;
@@ -67,22 +68,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   flex: 1;
 }
 
 .navLink {
-  color: #2c2c2c;
+  color: #1f2937;
   text-decoration: none;
-  padding: 10px 14px;
+  padding: 9px 13px;
   border-radius: 999px;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: background 0.2s ease, color 0.2s ease;
+  font-size: 0.96rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
 }
 
 .navLink:hover {
-  background: rgba(20, 20, 20, 0.04);
+  background: rgba(37, 99, 235, 0.06);
+  color: #0f172a;
 }
 
 .menuButton {

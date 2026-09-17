@@ -1,9 +1,34 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { VscCommentDiscussion } from "react-icons/vsc";
 import { getPostPublic } from "../../services/postPublic.service";
 import { useSocketEmit } from "../../../socket/useSocketEmit";
 import styles from "./PostPublicList.module.css";
+
+const getLevelScore = (post) => {
+  const profileCandidates = [
+    post.user,
+    post.user?.user,
+    post.user?.data,
+    post.userData,
+    post.profile,
+    post.data?.user,
+    post.owner,
+    post.author,
+    post.post?.user,
+    post,
+  ].filter((candidate) => candidate && typeof candidate === "object");
+
+  const value =
+    profileCandidates.find((candidate) => candidate.levelScore !== undefined)?.levelScore ??
+    post.levelScore ??
+    post.level ??
+    0;
+
+  const parsed = Number.parseFloat(String(value).replace(/[^\d.]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
 
 export default function PublicPosts() {
   const [posts, setPosts] = useState([]);
@@ -16,6 +41,7 @@ export default function PublicPosts() {
   const [loadingAction, setLoadingAction] = useState({});
   const [editingComment, setEditingComment] = useState({}); // { [commentId]: string }
   const [activeTab, setActiveTab] = useState("all");
+  const [sortDirection, setSortDirection] = useState("desc");
 
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -185,8 +211,18 @@ export default function PublicPosts() {
       );
     }
 
+    if (activeTab === "level") {
+      return sortedPosts.sort((firstPost, secondPost) => {
+        const firstScore = getLevelScore(firstPost);
+        const secondScore = getLevelScore(secondPost);
+        return sortDirection === "asc"
+          ? firstScore - secondScore
+          : secondScore - firstScore;
+      });
+    }
+
     return sortedPosts;
-  }, [activeTab, likesMap, posts]);
+  }, [activeTab, likesMap, posts, sortDirection]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
   if (loading) {
@@ -221,6 +257,7 @@ export default function PublicPosts() {
           { value: "all", label: "Tutti" },
           { value: "recent", label: "Più recenti" },
           { value: "liked", label: "Più apprezzati" },
+          { value: "level", label: sortDirection === "asc" ? "Level ↑" : "Level ↓" },
         ].map((tab) => (
           <button
             key={tab.value}
@@ -228,22 +265,20 @@ export default function PublicPosts() {
             role="tab"
             aria-selected={activeTab === tab.value}
             className={`${styles.tab} ${activeTab === tab.value ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab(tab.value)}
+            onClick={() => {
+              if (tab.value === "level") {
+                setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+                setActiveTab("level");
+                return;
+              }
+
+              setActiveTab(tab.value);
+            }}
           >
             {tab.label}
           </button>
         ))}
       </div>
-
-      <div className={styles.filters} aria-label="Filtri">
-        <button type="button" className={styles.filterChip}>Tipo di lezione</button>
-        <button type="button" className={styles.filterChip}>Distanza</button>
-        <button type="button" className={styles.filterChip}>Tariffe</button>
-        <button type="button" className={styles.filterChip}>Livelli</button>
-        <button type="button" className={styles.filterChip}>Tempo di risposta</button>
-      </div>
-
-      <p className={styles.resultsLabel}>71 insegnanti disponibili</p>
 
       <ul className={styles.list}>
         {visiblePosts.map((post) => {
@@ -254,6 +289,7 @@ export default function PublicPosts() {
           const liked = hasLiked(postId);
           const isLiking = loadingAction[postId] === "like";
           const isCommenting = loadingAction[postId] === "comment";
+          const levelScore = getLevelScore(post);
 
           return (
             <li
@@ -299,6 +335,11 @@ export default function PublicPosts() {
                   <span className={styles.reviewCount}>(17 commenti)</span>
                 </div>
 
+                <div className={styles.levelRow}>
+                  <span className={styles.levelLabel}>Level score</span>
+                  <strong className={styles.levelValue}>{levelScore}</strong>
+                </div>
+
                 <div className={styles.teacher}> 
                   <span className={styles.teacherRole}>{post.title || "Istruttore di nuoto"}</span>
                 </div>
@@ -325,13 +366,10 @@ export default function PublicPosts() {
                   {liked ? "❤️" : "🤍"} {likeData.likesCount}
                 </button>
 
-                <button
-                  type="button"
-                  className={styles.commentsBtn}
-                  onClick={() => toggleComments(postId, post.comments)}
-                >
-                  {isOpen ? "Nascondi commenti" : `💬 Commenti (${comments.length})`}
-                </button>
+                <span className={styles.commentsBtn} aria-label={`Commenti: ${comments.length}`}>
+                  <VscCommentDiscussion className={styles.commentIcon} />
+                  <span>{comments.length}</span>
+                </span>
               </div>
 
               {/* ── Pannello commenti ── */}
