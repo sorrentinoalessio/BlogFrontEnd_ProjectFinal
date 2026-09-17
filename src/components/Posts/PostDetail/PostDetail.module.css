@@ -1,0 +1,32 @@
+.sidePanel {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  min-width: 0;
+  z-index: 10;
+}
+
+.sideCard {
+  width: min(270px, calc(100vw - 56px));
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+  height: fit-content;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 22px;
+  padding: 12px 12px 14px;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.03);
+}
+
+@media (max-width: 980px) {
+  .sidePanel {
+    position: static;
+    top: auto;
+  }
+
+  .sideCard {
+    max-height: none;
+    overflow: visible;
+    width: 100%;
+  }
+}
