@@ -9,9 +9,7 @@ const Home = () => {
         <div className={styles.layout}>
           <div className={styles.mainColumn}>
             <div className={styles.header}>
-              <p className={styles.title}>Professori di nuoto vicino a te</p>
             </div>
-
             <PublicPosts />
           </div>
         </div>

@@ -46,23 +46,6 @@
   filter: saturate(1.08) contrast(1.02);
 }
 
-.favoriteBtn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 42px;
-  height: 42px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  color: #0f172a;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
-  cursor: pointer;
-  font-size: 1.3rem;
-}
-
 .cardContent,
 .statusRow,
 .meta,
@@ -302,6 +285,48 @@
 
 .enroll {
   color: #4a4642;
+  font-weight: 700;
+}
+
+.mapPreview {
+  position: relative;
+  display: block;
+  margin: 16px 18px 0;
+  overflow: hidden;
+  min-height: 180px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+  background: #eaf2f4;
+  text-decoration: none;
+}
+
+.mapPreview iframe {
+  display: block;
+  width: 100%;
+  height: 180px;
+  border: 0;
+  pointer-events: none;
+}
+
+.mapPreview span {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #2d6972;
+  font-weight: 800;
+  text-align: center;
+}
+
+.mapFallback {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  color: #2d6972;
+  font-weight: 800;
 }
 
 .commentsList {

@@ -31,6 +31,13 @@ const getLevelScore = (post) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const getPostImageUrl = (post) => {
+  const image = post.imageUrl || post.imagePost || post.img;
+  if (!image) return "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80";
+  if (/^(https?:\/\/|data:|blob:)/i.test(image)) return image;
+  return `${import.meta.env.VITE_API_URL}/${String(image).replace(/^\/+/, "")}`;
+};
+
 export default function PublicPosts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -380,11 +387,8 @@ export default function PublicPosts() {
                 <div className={styles.cardImageWrap}>
                   <img
                     className={styles.cardImage}
-                    src={
-                      post.imageUrl ||
-                      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80"
-                    }
-                    alt={post.title || "Insegnante di nuoto"}
+                    src={getPostImageUrl(post)}
+                    alt={post.title }
                   />
                 </div>
 

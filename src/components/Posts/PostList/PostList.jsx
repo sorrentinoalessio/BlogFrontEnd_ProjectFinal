@@ -11,6 +11,26 @@ const statusOptions = [
     { value: "archived", label: "Archiviato" },
 ];
 
+const getMapEmbedUrl = (locality) => {
+    if (!locality) return "";
+    const value = String(locality);
+    const match = value.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/)
+        || value.match(/[?&](?:q|query)=(-?\d+(?:\.\d+)?)[,%20]+(-?\d+(?:\.\d+)?)/);
+    if (!match) return "";
+
+    const latitude = Number(match[1]);
+    const longitude = Number(match[2]);
+    const delta = 0.025;
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - delta},${latitude - delta},${longitude + delta},${latitude + delta}&layer=mapnik&marker=${latitude},${longitude}`;
+};
+
+const getPostImageUrl = (post) => {
+    const image = post.imageUrl || post.imagePost || post.img;
+    if (!image) return "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80";
+    if (/^(https?:\/\/|data:|blob:)/i.test(image)) return image;
+    return `${import.meta.env.VITE_API_URL}/${String(image).replace(/^\/+/, "")}`;
+};
+
 const PostList = ({ posts = [], user, onPostStatusChange }) => {
     const [openComments, setOpenComments] = useState({});
     const [visibleCount, setVisibleCount] = useState(STEP);
@@ -77,6 +97,7 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
             <ul className={styles.list}>
                 {visiblePosts.map((post) => {
                     const comments = post.comments ?? [];
+                    const locality = post.locality ?? post.location ?? post.data?.locality ?? "";
                     const enrollCount = Array.isArray(post.enroll)
                         ? post.enroll.length
                         : post.enrollCount ?? 0;
@@ -104,15 +125,9 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                             <div className={styles.cardImageWrap}>
                                 <img
                                     className={styles.cardImage}
-                                    src={
-                                        post.imageUrl ||
-                                        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80"
-                                    }
-                                    alt={post.title || "Insegnante di nuoto"}
+                                    src={getPostImageUrl(post)}
+                                    alt={post.title }
                                 />
-                                <button type="button" className={styles.favoriteBtn} aria-label="Salva post">
-                                    ♡
-                                </button>
                             </div>
 
                             <div className={styles.cardContent}>
@@ -120,21 +135,31 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                 <h3 className={styles.title}>{post.title}</h3>
                                 <p className={styles.description}>{post.description}</p>
 
-                                <div className={styles.metaRow}>
-                                    <span className={styles.star}>★</span>
-                                    <span className={styles.reviews}>5</span>
-                                    <span className={styles.reviewCount}>(17 commenti)</span>
-                                </div>
-
                                 <div className={styles.teacher}>
-                                    <span className={styles.teacherRole}>{post.ownerName || "Insegnante"}</span>
+                                    <span className={styles.teacherRole}>{post.ownerName}</span>
                                 </div>
-
-                                <div className={styles.priceRow}>
-                                    <span className={styles.price}>{post.price || "40€"}</span>
-                                    <span className={styles.priceSuffix}>/ora</span>
-                                </div>
+                              
                             </div>
+
+                            {locality && (
+                                <a
+                                    className={styles.mapPreview}
+                                    href={locality}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    {getMapEmbedUrl(locality) ? (
+                                        <iframe
+                                            title="Anteprima del luogo"
+                                            src={getMapEmbedUrl(locality)}
+                                            loading="lazy"
+                                            referrerPolicy="no-referrer-when-downgrade"
+                                        />
+                                    ) : (
+                                        <div className={styles.mapFallback}>📍 Posizione salvata</div>
+                                    )}
+                                </a>
+                            )}
 
                             <div className={styles.statusRow}>
                                 <span className={styles.statusLabel} id={`status-${post._id}`}>
@@ -205,7 +230,7 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                 </button>
 
                                 <div className={styles.rightActions}>
-                                    <span className={styles.enroll}>❤️ {enrollCount}</span>
+                                    <span className={styles.enroll}>{enrollCount} partecipanti</span>
 
                                     <button
                                         type="button"

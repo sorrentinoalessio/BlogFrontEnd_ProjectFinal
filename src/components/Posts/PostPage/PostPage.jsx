@@ -11,8 +11,8 @@ import { userSelectors } from "../../../reducers/user.slice";
 import Card from '../../Card/Card';
 
 const STATUS = [
-  { value: "draft", label: "Bozze" },
   { value: "public", label: "Pubblicati" },
+  { value: "draft", label: "Bozze" },
   { value: "archived", label: "Vecchi" },
 ];
 

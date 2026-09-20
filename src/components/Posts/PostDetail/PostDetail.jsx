@@ -37,9 +37,15 @@ const resolvePostImage = (post) => {
 
 const getMapEmbedUrl = (locality) => {
     if (!locality) return "";
-    const match = locality.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
-    if (!match) return locality;
-    return `https://www.google.com/maps?q=${match[1]},${match[2]}&z=15&output=embed`;
+    const value = String(locality);
+    const match = value.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/)
+        || value.match(/[?&](?:q|query)=(-?\d+(?:\.\d+)?)[,%20]+(-?\d+(?:\.\d+)?)/);
+    if (!match) return "";
+
+    const latitude = Number(match[1]);
+    const longitude = Number(match[2]);
+    const delta = 0.025;
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - delta},${latitude - delta},${longitude + delta},${latitude + delta}&layer=mapnik&marker=${latitude},${longitude}`;
 };
 
 export default function PostDetail() {
@@ -321,12 +327,15 @@ export default function PostDetail() {
                                                 loading="lazy"
                                                 referrerPolicy="no-referrer-when-downgrade"
                                             />
-                                            <span className={sharedStyles.mapPreviewLabel}>📍 Apri il luogo su Google Maps</span>
+                                            
                                         </a>
+                                        
                                     ) : (
                                         <p>Luogo non specificato.</p>
                                     )}
+                                    
                                 </div>
+                                
                             </div>
 
                             <button
@@ -452,7 +461,7 @@ export default function PostDetail() {
                                                 post.imageUrl ||
                                                 SWIMMING_AVATAR
                                             }
-                                            alt={post.ownerName || profile.name || "Instructor"}
+                                            alt={post.ownerName || profile.name }
                                             className={sharedStyles.sideImage}
                                             onError={(event) => {
                                                 event.currentTarget.onerror = null;
@@ -460,23 +469,16 @@ export default function PostDetail() {
                                             }}
                                         />
                                     </div>
-                                    <button type="button" className={sharedStyles.shareBtn} aria-label="Condividi">↗</button>
                                 </div>
 
-                                <h2 className={sharedStyles.sideName}>{post.ownerName || profile.name || "Calogero"}</h2>
-                                <div className={sharedStyles.sideMeta}>
-                                    <span className={sharedStyles.sideStar}>★</span>
-                                    <span>5</span>
-                                    <span className={sharedStyles.sideMetaText}>(17 commenti)</span>
-                                </div>
-
+                                <h2 className={sharedStyles.sideName}><h6>Creato da:</h6>{post.ownerName || profile.name || "No name"}</h2>
                                 <div className={sharedStyles.sideStats}>
                                     <div className={sharedStyles.sideRow}>
                                         <span>Level score</span>
                                         <strong>{levelScore}</strong>
                                     </div>
                                     <div className={sharedStyles.sideRow}>
-                                        <span>Tempo 100 metri</span>
+                                        <span>Tempo nei 100 metri</span>
                                         <strong>{timeForHundredMeters}</strong>
                                     </div>
                                     <div className={sharedStyles.sideRow}>
@@ -484,8 +486,7 @@ export default function PostDetail() {
                                         <strong>{publicPostsCount}</strong>
                                     </div>
                                 </div>
-
-                                <button type="button" className={sharedStyles.contactBtn}>Contattare</button>
+                              
                             </div>
                         </aside>
                     </article>
