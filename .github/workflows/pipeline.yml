@@ -3,7 +3,7 @@ name: Deploy Frontend
 on:
   push:
     branches:
-      - main
+      - produzione
 
 jobs:
   build-and-deploy:
@@ -29,7 +29,7 @@ jobs:
         with:
           switches: -avzr --delete
           path: dist/
-          remote_path: /var/www/frontend/
+          remote_path: /var/www/swimigo/frontend
           remote_host: ${{ secrets.ARUBA_HOST }}
           remote_user: ${{ secrets.ARUBA_USER }}
           remote_key: ${{ secrets.ARUBA_SSH_KEY }}
