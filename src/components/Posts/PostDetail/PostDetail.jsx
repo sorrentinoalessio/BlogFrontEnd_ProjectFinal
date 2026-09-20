@@ -27,6 +27,20 @@ const resolveAvatarUrl = (avatar) => {
         : "";
 };
 
+const resolvePostImage = (post) => {
+    const value = post.imagePost || post.imageUrl || post.img || "";
+    if (!value) return "";
+    if (/^(https?:\/\/|data:|blob:)/i.test(value)) return value;
+    return `${import.meta.env.VITE_API_URL}/${value.replace(/^\/+/, "")}`;
+};
+
+const getMapEmbedUrl = (locality) => {
+    if (!locality) return "";
+    const match = locality.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+    if (!match) return locality;
+    return `https://www.google.com/maps?q=${match[1]},${match[2]}&z=15&output=embed`;
+};
+
 export default function PostDetail() {
     const { id } = useParams(); // legge :id da /user/post/:id
     const [posts, setPosts] = useState([]); // se vuoi tenere il map esistente
@@ -244,60 +258,50 @@ export default function PostDetail() {
                 return (
                     <article key={postId} className={sharedStyles.singlePostLayout}>
                         <div className={sharedStyles.mainContent}>
-                            <div className={sharedStyles.categoryTag}>Nuoto</div>
+                            <div className={sharedStyles.categoryTag}>Attività</div>
 
-                            <h1 className={sharedStyles.heroTitle}>
-                                {post.title || "Istruttore di nuoto, laureato Magistrale in \"Scienze e tecniche delle attività motorie preventive e adattate\" propone lezioni di nuoto a tutte le età e i livelli."}
-                            </h1>
+                            <h1 className={sharedStyles.heroTitle}>{post.title || "Attività senza titolo"}</h1>
 
-                            <div className={sharedStyles.locationBlock}>
-                                <h2 className={sharedStyles.locationTitle}>Luogo del corso</h2>
-                                <div className={sharedStyles.locationPills}>
-                                    <span className={sharedStyles.locationPill}>📍 {post.location || "Presso Calogero: Vimercate"}</span>
-                                    <span className={sharedStyles.locationPill}>🏊‍♂️ A casa tua : spostamento fino a 10 km da Vimercate</span>
-                                </div>
+                            {resolvePostImage(post) && (
+                                <img
+                                    className={sharedStyles.detailPostImage}
+                                    src={resolvePostImage(post)}
+                                    alt={post.title || "Immagine del post"}
+                                />
+                            )}
+
+                            <div className={sharedStyles.detailDescription}>
+                                <h2>Descrizione</h2>
+                                <p>{post.description || "Nessuna descrizione disponibile."}</p>
                             </div>
 
                             <div className={sharedStyles.badgeCard}>
                                 <span className={sharedStyles.badgeIcon}>✦</span>
                                 <div>
-                                    <strong>Ambasciatore</strong>
-                                    <p>
-                                        È il meglio del meglio degli insegnanti. Qualità del profilo, eccellenza del livello,
-                                        risposta garantita. Calogero organizzerà con cura la tua prima lezione di Nuoto.
-                                    </p>
+                                    <strong>Luogo dell’attività</strong>
+                                    {post.locality ? (
+                                        <a className={sharedStyles.mapPreview} href={post.locality} target="_blank" rel="noreferrer">
+                                            <iframe
+                                                title="Anteprima del luogo"
+                                                src={getMapEmbedUrl(post.locality)}
+                                                loading="lazy"
+                                                referrerPolicy="no-referrer-when-downgrade"
+                                            />
+                                            <span className={sharedStyles.mapPreviewLabel}>📍 Apri il luogo su Google Maps</span>
+                                        </a>
+                                    ) : (
+                                        <p>Luogo non specificato.</p>
+                                    )}
                                 </div>
                             </div>
 
-                            <div className={sharedStyles.bioSection}>
-                                <h3>Riguardo Calogero</h3>
-                                <p>
-                                    {post.description ||
-                                        "Ho conseguito la laurea Magistrale in \"Scienze e tecniche delle attività motorie preventive e adattate\" presso l'Università degli Studi di Milano ottenendo il massimo dei voti. Durante gli studi ho lavorato in qualità di docente nelle scuole secondarie di secondo grado. Ho svolto successivamente al mio percorso di studi, 6 mesi di tirocinio nel laboratorio di ricerca della mia Università per continuare la mia tesi sperimentale."}
-                                </p>
-                            </div>
+                            <button type="button" className={sharedStyles.participateBtn}>Partecipa</button>
 
-                            <div className={sharedStyles.offerSection}>
-                                <p className={sharedStyles.offerIntro}>Che tu sia un principiante assoluto, un adulto che vuole superare la paura dell'acqua o un semplice desiderio di migliorare la tua tecnica, offro lezioni personalizzate adatte al tuo livello e ai tuoi obiettivi.</p>
-
-                                <div className={sharedStyles.offerListWrap}>
-                                    <h4>Cosa offro:</h4>
-                                    <ul className={sharedStyles.offerList}>
-                                        <li>Lezioni individuali o in piccoli gruppi;</li>
-                                        <li>Approccio progressivo e motivante;</li>
-                                        <li>Tecniche efficaci per superare l'insicurezza in acqua;</li>
-                                        <li>Allenamenti tecnici per migliorare stile e resistenza;</li>
-                                        <li>Esperienza con tutte le età: bambini, ragazzi, adulti.</li>
-                                    </ul>
-                                </div>
-
-                                <p className={sharedStyles.offerClosing}>Con passione, competenza e metodo, ti guiderò passo dopo passo nel tuo percorso in acqua.</p>
-                            </div>
+                           
 
                             <div className={sharedStyles.commentsSection}>
                                 <div className={sharedStyles.commentsHeader}>
                                     <h3>Commenti</h3>
-                                    <span className={sharedStyles.commentsRating}>★ 5 (17 commenti)</span>
                                 </div>
 
                                 {comments.length ? (

@@ -50,33 +50,33 @@ export default function PublicPosts() {
 
   // ── Carica i post ──────────────────────────────────────────────────────────
   useEffect(() => {
-   const fetchPosts = async () => {
-  try {
-    const data = await getPostPublic();
+    const fetchPosts = async () => {
+      try {
+        const data = await getPostPublic();
 
-    console.log("RISPOSTA getPostPublic:", data);
-    console.log("È un array?", Array.isArray(data));
+        console.log("RISPOSTA getPostPublic:", data);
+        console.log("È un array?", Array.isArray(data));
 
-    setPosts(data);
+        setPosts(data);
 
-    const initialLikes = {};
+        const initialLikes = {};
 
-    data.forEach((p) => {
-      initialLikes[p._id] = {
-        likes: Array.isArray(p.likes) ? p.likes : [],
-        likesCount:
-          p.likesCount ??
-          (Array.isArray(p.likes) ? p.likes.length : 0),
-      };
-    });
+        data.forEach((p) => {
+          initialLikes[p._id] = {
+            likes: Array.isArray(p.likes) ? p.likes : [],
+            likesCount:
+              p.likesCount ??
+              (Array.isArray(p.likes) ? p.likes.length : 0),
+          };
+        });
 
-    setLikesMap(initialLikes);
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+        setLikesMap(initialLikes);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchPosts();
   }, []);
 
@@ -201,7 +201,7 @@ export default function PublicPosts() {
           post.title,
           post.description,
           post.ownerName,
-          post.location,
+          post.locality,
           ...(Array.isArray(post.tag) ? post.tag.map((tag) => typeof tag === "string" ? tag : tag?.tag) : []),
         ]
           .filter(Boolean)
@@ -324,266 +324,264 @@ export default function PublicPosts() {
       </div>
 
       {visiblePosts.length ? (
-      <ul className={styles.list}>
-        {visiblePosts.map((post) => {
-          const postId = post._id;
-          const likeData = likesMap[postId] ?? { likes: [], likesCount: 0 };
-          const comments = commentsMap[postId] ?? post.comments ?? [];
-          const isOpen = !!openComments[postId];
-          const liked = hasLiked(postId);
-          const isLiking = loadingAction[postId] === "like";
-          const isCommenting = loadingAction[postId] === "comment";
-          const levelScore = getLevelScore(post);
+        <ul className={styles.list}>
+          {visiblePosts.map((post) => {
+            const postId = post._id;
+            const likeData = likesMap[postId] ?? { likes: [], likesCount: 0 };
+            const comments = commentsMap[postId] ?? post.comments ?? [];
+            const isOpen = !!openComments[postId];
+            const liked = hasLiked(postId);
+            const isLiking = loadingAction[postId] === "like";
+            const isCommenting = loadingAction[postId] === "comment";
+            const levelScore = getLevelScore(post);
 
-          return (
-            <li
-              key={postId}
-              className={styles.card}
-              onClick={(event) => openPost(postId, event)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  openPost(postId, event);
-                }
-              }}
-              role="link"
-              tabIndex={0}
-            >
-              <div className={styles.cardImageWrap}>
-                <img
-                  className={styles.cardImage}
-                  src={
-                    post.imageUrl ||
-                    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80"
+            return (
+              <li
+                key={postId}
+                className={styles.card}
+                onClick={(event) => openPost(postId, event)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    openPost(postId, event);
                   }
-                  alt={post.title || "Insegnante di nuoto"}
-                />
-                <button
-                  type="button"
-                  className={`${styles.favoriteBtn} ${liked ? styles.favoriteActive : ""}`}
-                  onClick={() => handleLike(postId)}
-                  disabled={!user?.accessToken || isLiking}
-                  aria-label={liked ? "Rimuovi like" : "Metti like"}
-                  title={user?.accessToken ? "Metti like" : "Accedi per mettere like"}
-                >
-                  {liked ? "♥" : "♡"}
-                </button>
-              </div>
-
-              <div className={styles.cardContent}>
-                <h3 className={styles.title}>{post.ownerName || "Calogero"}</h3>
-                <p className={styles.description}>{post.location || "Vimercate (presenziale)"}</p>
-
-                <div className={styles.metaRow}>
-                  <span className={styles.star}>★</span>
-                  <span className={styles.reviews}>5</span>
-                  <span className={styles.reviewCount}>(17 commenti)</span>
+                }}
+                role="link"
+                tabIndex={0}
+              >
+                <div className={styles.cardImageWrap}>
+                  <img
+                    className={styles.cardImage}
+                    src={
+                      post.imageUrl ||
+                      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80"
+                    }
+                    alt={post.title || "Insegnante di nuoto"}
+                  />
+                  <button
+                    type="button"
+                    className={`${styles.favoriteBtn} ${liked ? styles.favoriteActive : ""}`}
+                    onClick={() => handleLike(postId)}
+                    disabled={!user?.accessToken || isLiking}
+                    aria-label={liked ? "Rimuovi like" : "Metti like"}
+                    title={user?.accessToken ? "Metti like" : "Accedi per mettere like"}
+                  >
+                    {liked ? "♥" : "♡"}
+                  </button>
                 </div>
 
-                <div className={styles.levelRow}>
-                  <span className={styles.levelLabel}>Level score</span>
-                  <strong className={styles.levelValue}>{levelScore}</strong>
+                <div className={styles.cardContent}>
+                  <p className={styles.description}><h3>Luogo dell' attività:</h3> {post.title || "Vimercate (presenziale)"}</p>
+                 
+                  <div className={styles.levelRow}>
+                    <span className={styles.levelLabel}>Level score</span>
+                    <strong className={styles.levelValue}>{levelScore}</strong>
+                  </div>
+                  <p>Creata da:</p><h2 className={styles.title}>{post.ownerName || "Calogero"}</h2>
+
                 </div>
 
-                <div className={styles.teacher}> 
-                  <span className={styles.teacherRole}>{post.title || "Istruttore di nuoto"}</span>
-                </div>
+                {/* ── Azioni ── */}
+                <div className={styles.actions}>
+                  <button
+                    type="button"
+                    className={`${styles.likeBtn} ${liked ? styles.liked : ""}`}
+                    onClick={() => handleLike(postId)}
+                    disabled={!user?.accessToken || isLiking}
+                    title={
+                      user?.accessToken
+                        ? liked ? "Rimuovi like" : "Metti like"
+                        : "Accedi per mettere like"
+                    }
+                  >
+                    {liked ? "❤️" : "🤍"} {likeData.likesCount}
+                  </button>
 
-                <div className={styles.priceRow}>
-                  <span className={styles.price}>{post.price || "40€"}</span>
-                  <span className={styles.priceSuffix}>/ora</span>
-                </div>
-              </div>
+                  <span className={styles.commentsBtn} aria-label={`Commenti: ${comments.length}`}>
+                    <VscCommentDiscussion className={styles.commentIcon} />
+                    <span>{comments.length}</span>
+                  </span>
 
-              {/* ── Azioni ── */}
-              <div className={styles.actions}>
-                <button
-                  type="button"
-                  className={`${styles.likeBtn} ${liked ? styles.liked : ""}`}
-                  onClick={() => handleLike(postId)}
-                  disabled={!user?.accessToken || isLiking}
-                  title={
-                    user?.accessToken
-                      ? liked ? "Rimuovi like" : "Metti like"
-                      : "Accedi per mettere like"
-                  }
-                >
-                  {liked ? "❤️" : "🤍"} {likeData.likesCount}
-                </button>
-
-                <span className={styles.commentsBtn} aria-label={`Commenti: ${comments.length}`}>
-                  <VscCommentDiscussion className={styles.commentIcon} />
-                  <span>{comments.length}</span>
-                </span>
-              </div>
-
-              {/* ── Pannello commenti ── */}
-              {isOpen && (
-                <div className={styles.commentsPanel}>
-                  {/* Form aggiunta commento */}
-                  {user?.accessToken ? (
-                    <div className={styles.addComment}>
-                      <textarea
-                        className={styles.commentInput}
-                        placeholder="Scrivi un commento..."
-                        rows={1}
-                        value={commentText[postId] ?? ""}
-                        onChange={(e) => {
-                          setCommentText((prev) => ({ ...prev, [postId]: e.target.value }));
-                        }}
-                        onInput={(e) => {
-                          // Si attiva a ogni inserimento di testo o riga vuota, regolando l'altezza
-                          e.target.style.height = "auto";
-                          e.target.style.height = `${e.target.scrollHeight}px`;
-                        }}
-                      />
-                      <button
-                        type="button"
-                        className={styles.sendBtn}
-                        onClick={(e) => {
-                          handleAddComment(postId);
-                          // Trova la textarea e resetta la sua altezza dopo l'invio
-                          const textarea = e.currentTarget.previousElementSibling;
-                          if (textarea) textarea.style.height = "auto";
-                        }}
-                        disabled={isCommenting || !(commentText[postId] ?? "").trim()}
-                      >
-                        {isCommenting ? "..." : "Invia"}
-                      </button>
-                    </div>
-
-
-
-                  ) : (
-                    <p className={styles.loginHint}>Accedi per commentare.</p>
+                  {post.locality && (
+                    <a
+                      className={styles.locationBtn}
+                      href={post.locality}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      📍 Posizione
+                    </a>
                   )}
+                </div>
 
-                  {/* Lista commenti */}
-                  <ul className={styles.commentsList}>
-                    {comments.length ? (
-                      comments.map((c, i) => {
-                        const isOwn =
-                          user?.userId && c.ownerId?.toString() === user.userId;
-                        console.log("isOwn:", isOwn);
-                        const isEditing = editingComment[c._id] !== undefined;
+                {/* ── Pannello commenti ── */}
+                {isOpen && (
+                  <div className={styles.commentsPanel}>
+                    {/* Form aggiunta commento */}
+                    {user?.accessToken ? (
+                      <div className={styles.addComment}>
+                        <textarea
+                          className={styles.commentInput}
+                          placeholder="Scrivi un commento..."
+                          rows={1}
+                          value={commentText[postId] ?? ""}
+                          onChange={(e) => {
+                            setCommentText((prev) => ({ ...prev, [postId]: e.target.value }));
+                          }}
+                          onInput={(e) => {
+                            // Si attiva a ogni inserimento di testo o riga vuota, regolando l'altezza
+                            e.target.style.height = "auto";
+                            e.target.style.height = `${e.target.scrollHeight}px`;
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className={styles.sendBtn}
+                          onClick={(e) => {
+                            handleAddComment(postId);
+                            // Trova la textarea e resetta la sua altezza dopo l'invio
+                            const textarea = e.currentTarget.previousElementSibling;
+                            if (textarea) textarea.style.height = "auto";
+                          }}
+                          disabled={isCommenting || !(commentText[postId] ?? "").trim()}
+                        >
+                          {isCommenting ? "..." : "Invia"}
+                        </button>
+                      </div>
 
-                        return (
-                          <li key={c._id ?? i} className={styles.commentItem}>
-                            <div className={styles.commentBody}>
-                              <strong className={styles.commentAuthor}>
-                                {c.authorName ?? c.author?.name ?? "Utente"}
-                              </strong>
-                              <span className={styles.commentDate}>
-                                {c.createdAt
-                                  ? new Date(c.createdAt).toLocaleDateString("it-IT", {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })
-                                  : "data non disponibile"}
-                              </span>
 
-                              {/* testo o input di modifica */}
-                              {isEditing ? (
-                                <input
-                                  className={styles.commentInput}
-                                  value={editingComment[c._id]}
-                                  onChange={(e) =>
-                                    setEditingComment((prev) => ({
-                                      ...prev,
-                                      [c._id]: e.target.value,
-                                    }))
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter")
-                                      handleEditComment(postId, c._id, c.comment ?? c.text);
-                                    if (e.key === "Escape")
-                                      setEditingComment((prev) => {
-                                        const s = { ...prev };
-                                        delete s[c._id];
-                                        return s;
-                                      });
-                                  }}
-                                  autoFocus
-                                />
-                              ) : (
-                                <span className={styles.commentText}>
-                                  {c.comment ?? c.text ?? c.content}
+
+                    ) : (
+                      <p className={styles.loginHint}>Accedi per commentare.</p>
+                    )}
+
+                    {/* Lista commenti */}
+                    <ul className={styles.commentsList}>
+                      {comments.length ? (
+                        comments.map((c, i) => {
+                          const isOwn =
+                            user?.userId && c.ownerId?.toString() === user.userId;
+                          console.log("isOwn:", isOwn);
+                          const isEditing = editingComment[c._id] !== undefined;
+
+                          return (
+                            <li key={c._id ?? i} className={styles.commentItem}>
+                              <div className={styles.commentBody}>
+                                <strong className={styles.commentAuthor}>
+                                  {c.authorName ?? c.author?.name ?? "Utente"}
+                                </strong>
+                                <span className={styles.commentDate}>
+                                  {c.createdAt
+                                    ? new Date(c.createdAt).toLocaleDateString("it-IT", {
+                                      day: "2-digit",
+                                      month: "2-digit",
+                                      year: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })
+                                    : "data non disponibile"}
                                 </span>
-                              )}
-                            </div>
 
-                            {/* bottoni azione — solo per i propri commenti */}
-                            {isOwn && (
-                              <div className={styles.commentActions}>
+                                {/* testo o input di modifica */}
                                 {isEditing ? (
-                                  <>
-                                    <button
-                                      type="button"
-                                      className={styles.saveCommentBtn}
-                                      onClick={() =>
-                                        handleEditComment(postId, c._id, c.comment ?? c.text)
-                                      }
-                                      title="Salva modifica"
-                                    >
-                                      ✅
-                                    </button>
-                                    <button
-                                      type="button"
-                                      className={styles.cancelCommentBtn}
-                                      onClick={() =>
+                                  <input
+                                    className={styles.commentInput}
+                                    value={editingComment[c._id]}
+                                    onChange={(e) =>
+                                      setEditingComment((prev) => ({
+                                        ...prev,
+                                        [c._id]: e.target.value,
+                                      }))
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter")
+                                        handleEditComment(postId, c._id, c.comment ?? c.text);
+                                      if (e.key === "Escape")
                                         setEditingComment((prev) => {
                                           const s = { ...prev };
                                           delete s[c._id];
                                           return s;
-                                        })
-                                      }
-                                      title="Annulla"
-                                    >
-                                      ❌
-                                    </button>
-                                  </>
+                                        });
+                                    }}
+                                    autoFocus
+                                  />
                                 ) : (
-                                  <>
-                                    <button
-                                      type="button"
-                                      className={styles.editCommentBtn}
-                                      onClick={() =>
-                                        setEditingComment((prev) => ({
-                                          ...prev,
-                                          [c._id]: c.comment ?? c.text ?? "",
-                                        }))
-                                      }
-                                      title="Modifica commento"
-                                    >
-                                      ✏️
-                                    </button>
-                                    <button
-                                      type="button"
-                                      className={styles.deleteCommentBtn}
-                                      onClick={() => handleDeleteComment(postId, c._id)}
-                                      title="Elimina commento"
-                                    >
-                                      <p className="{styles.deleteCommentBtn}">elimina</p>
-                                    </button>
-                                  </>
+                                  <span className={styles.commentText}>
+                                    {c.comment ?? c.text ?? c.content}
+                                  </span>
                                 )}
                               </div>
-                            )}
-                          </li>
-                        );
-                      })
-                    ) : (
-                      <li className={styles.commentItem}>Nessun commento ancora.</li>
-                    )}
-                  </ul>
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+
+                              {/* bottoni azione — solo per i propri commenti */}
+                              {isOwn && (
+                                <div className={styles.commentActions}>
+                                  {isEditing ? (
+                                    <>
+                                      <button
+                                        type="button"
+                                        className={styles.saveCommentBtn}
+                                        onClick={() =>
+                                          handleEditComment(postId, c._id, c.comment ?? c.text)
+                                        }
+                                        title="Salva modifica"
+                                      >
+                                        ✅
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className={styles.cancelCommentBtn}
+                                        onClick={() =>
+                                          setEditingComment((prev) => {
+                                            const s = { ...prev };
+                                            delete s[c._id];
+                                            return s;
+                                          })
+                                        }
+                                        title="Annulla"
+                                      >
+                                        ❌
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <button
+                                        type="button"
+                                        className={styles.editCommentBtn}
+                                        onClick={() =>
+                                          setEditingComment((prev) => ({
+                                            ...prev,
+                                            [c._id]: c.comment ?? c.text ?? "",
+                                          }))
+                                        }
+                                        title="Modifica commento"
+                                      >
+                                        ✏️
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className={styles.deleteCommentBtn}
+                                        onClick={() => handleDeleteComment(postId, c._id)}
+                                        title="Elimina commento"
+                                      >
+                                        <p className="{styles.deleteCommentBtn}">elimina</p>
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </li>
+                          );
+                        })
+                      ) : (
+                        <li className={styles.commentItem}>Nessun commento ancora.</li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       ) : (
         <div className={styles.status}>
           <p>Nessun post corrisponde alla ricerca.</p>

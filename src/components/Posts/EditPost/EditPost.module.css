@@ -3,6 +3,14 @@
 	width: 100%;
 }
 
+.form > .titleField { order: 1; }
+.form > .descriptionField { order: 2; }
+.form > .mapField { order: 3; }
+.form > .row,
+.form > .field:not(.titleField):not(.descriptionField):not(.mapField),
+.form > .previewWrapper,
+.form > .actions { order: 4; }
+
 .form {
 	display: grid;
 	gap: 20px;
@@ -314,6 +322,34 @@
 	color: #c54d48;
 	font-size: 0.84rem;
 	font-weight: 600;
+}
+
+.mapPickerButton { display: flex; align-items: center; gap: 10px; min-height: 47px; padding: 0 14px; border: 1px solid #d8d0c8; border-radius: 12px; background: #fffdfa; color: #2d6972; font-weight: 800; text-align: left; cursor: pointer; }
+.mapPickerButton:hover { border-color: #477b83; box-shadow: 0 0 0 3px rgba(71, 123, 131, 0.12); }
+.mapPin { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: rgba(71, 123, 131, 0.12); font-size: 1.2rem; }
+.mapLink { width: fit-content; color: #2d6972; font-size: 0.9rem; font-weight: 700; }
+.mapModalBackdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(15, 23, 42, 0.32); backdrop-filter: blur(4px); }
+.mapModal { width: min(560px, 100%); padding: 24px; border: 1px solid rgba(216, 208, 200, 0.9); border-radius: 18px; background: #fffdfa; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2); }
+.mapModalHeader, .mapSearchRow, .mapModalActions { display: flex; align-items: center; gap: 12px; }
+.mapModalHeader { justify-content: space-between; margin-bottom: 8px; }
+.mapModal h2 { margin: 2px 0 0; color: #242220; font-size: 1.35rem; }
+.mapEyebrow { color: #477b83; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+.mapClose { width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(71, 123, 131, 0.1); color: #2d6972; font-size: 1.5rem; line-height: 1; cursor: pointer; }
+.mapHelp { margin: 0 0 18px; color: #6b625a; line-height: 1.5; }
+.mapSearchRow { align-items: stretch; margin-bottom: 16px; }
+.mapSearchRow .input { min-width: 0; flex: 1; }
+.mapOpenButton { display: inline-flex; align-items: center; justify-content: center; min-height: 47px; padding: 0 14px; border: 0; border-radius: 12px; background: #477b83; color: #fff; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.mapOpenButton:disabled { opacity: 0.5; cursor: not-allowed; }
+.mapSearchError { display: block; margin: -8px 0 12px; color: #c54d48; font-weight: 700; }
+.mapCanvas { width: 100%; height: 340px; border: 1px solid #d8d0c8; border-radius: 14px; overflow: hidden; }
+.coordinatesText { margin: 10px 0 0; color: #477b83; font-size: 0.85rem; font-weight: 700; }
+.mapModalActions { justify-content: flex-end; margin-top: 20px; }
+.mapModalActions .primaryBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+@media (max-width: 640px) {
+	.mapModal { padding: 18px; }
+	.mapSearchRow, .mapModalActions { flex-direction: column; align-items: stretch; }
+	.mapOpenButton, .mapModalActions .secondaryBtn, .mapModalActions .primaryBtn { width: 100%; }
 }
 
 .previewWrapper {
