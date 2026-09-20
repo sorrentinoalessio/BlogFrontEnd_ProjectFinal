@@ -77,9 +77,9 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
             <ul className={styles.list}>
                 {visiblePosts.map((post) => {
                     const comments = post.comments ?? [];
-                    const likesCount = Array.isArray(post.likes)
-                        ? post.likes.length
-                        : post.likesCount ?? 0;
+                    const enrollCount = Array.isArray(post.enroll)
+                        ? post.enroll.length
+                        : post.enrollCount ?? 0;
                     const isOpen = !!openComments[post._id];
                     const statusClass =
                         post.status === "draft"
@@ -205,7 +205,7 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                                 </button>
 
                                 <div className={styles.rightActions}>
-                                    <span className={styles.likes}>❤️ {likesCount}</span>
+                                    <span className={styles.enroll}>❤️ {enrollCount}</span>
 
                                     <button
                                         type="button"

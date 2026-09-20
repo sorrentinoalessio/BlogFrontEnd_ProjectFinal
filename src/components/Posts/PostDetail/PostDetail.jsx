@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useSocketEmit } from "../../../socket/useSocketEmit";
 import sharedStyles from "../PostPublicList/PostPublicList.module.css";
 import detailStyles from "./PostDetail.module.css";
 import { getPostDetails } from "../../services/postDetails.service.js";
 import { getPostPublic } from "../../services/postPublic.service.js";
+import { toast } from "react-toastify";
 
 const SWIMMING_AVATAR =
     "https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=800&q=85";
@@ -43,10 +44,11 @@ const getMapEmbedUrl = (locality) => {
 
 export default function PostDetail() {
     const { id } = useParams(); // legge :id da /user/post/:id
+    const location = useLocation();
     const [posts, setPosts] = useState([]); // se vuoi tenere il map esistente
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [likesMap, setLikesMap] = useState({});
+    const [enrollMap, setenrollMap] = useState({});
     const [commentsMap, setCommentsMap] = useState({});
     const [openComments, setOpenComments] = useState({});
     const [commentText, setCommentText] = useState({});
@@ -54,7 +56,7 @@ export default function PostDetail() {
     const [editingComment, setEditingComment] = useState({}); // { [commentId]: string }
 
     const user = useSelector((state) => state.user);
-    const { likePost, addComment, deleteComment } = useSocketEmit();
+    const { enrollPost, addComment, deleteComment } = useSocketEmit();
 
     // ── Carica i post ──────────────────────────────────────────────────────────
     useEffect(() => {
@@ -66,18 +68,27 @@ export default function PostDetail() {
                     ? await getPostDetails(id, user.accessToken)
                     : (await getPostPublic()).find((post) => String(post._id) === String(id));
                 if (!data) throw new Error("Post pubblico non trovato");
-                const postArray = Array.isArray(data) ? data : [data]; // normalizza a array
+                const postArray = (Array.isArray(data) ? data : [data]).map((post) => {
+                    const navigationPost = location.state?.post;
+                    if (!navigationPost || String(navigationPost._id) !== String(post._id)) return post;
+
+                    return {
+                        ...post,
+                        enroll: navigationPost.enroll ?? post.enroll,
+                        enrollCount: navigationPost.enrollCount ?? post.enrollCount,
+                    };
+                }); // mantiene subito il conteggio aggiornato dalla lista pubblica
                 setPosts(postArray);
-                const initialLikes = {};
+                const initialenroll = {};
                 const initialComments = {};
                 postArray.forEach((p) => {
-                    initialLikes[p._id] = {
-                        likes: Array.isArray(p.likes) ? p.likes : [],
-                        likesCount: p.likesCount ?? (Array.isArray(p.likes) ? p.likes.length : 0),
+                    initialenroll[p._id] = {
+                        enroll: Array.isArray(p.enroll) ? p.enroll : [],
+                        enrollCount: p.enrollCount ?? (Array.isArray(p.enroll) ? p.enroll.length : 0),
                     };
                     initialComments[p._id] = Array.isArray(p.comments) ? p.comments : [];
                 });
-                setLikesMap(initialLikes);
+                setenrollMap(initialenroll);
                 setCommentsMap(initialComments);
             } catch (err) {
                 setError(err.message);
@@ -88,32 +99,55 @@ export default function PostDetail() {
         fetchPosts();
     }, [id, user?.accessToken]);
 
-    // ── Helper: utente ha già messo like? ─────────────────────────────────────
-    const hasLiked = useCallback(
+    // ── Helper: utente ha già messo enroll? ─────────────────────────────────────
+    const hasenrolld = useCallback(
         (postId) => {
             if (!user?.userId) return false;
-            const entry = likesMap[postId];
+            const entry = enrollMap[postId];
             if (!entry) return false;
-            return entry.likes.some((id) => id?.toString() === user.userId);
+            return entry.enroll.some((id) => id?.toString() === user.userId);
         },
-        [likesMap, user]
+        [enrollMap, user]
     );
 
-    // ── Like toggle ────────────────────────────────────────────────────────────
-    const handleLike = async (postId) => {
-        if (!user?.accessToken) return;
-        setLoadingAction((prev) => ({ ...prev, [postId]: "like" }));
+    // ── enroll toggle ────────────────────────────────────────────────────────────
+    const handleenroll = async (postId) => {
+        if (!user?.accessToken) {
+            toast.info("Accedi per partecipare all'attività");
+            return;
+        }
+        setLoadingAction((prev) => ({ ...prev, [postId]: "enroll" }));
+        const currentEntry = enrollMap[postId] ?? { enroll: [], enrollCount: 0 };
+        const currentEnroll = Array.isArray(currentEntry.enroll) ? currentEntry.enroll : [];
+        const alreadyEnrolled = currentEnroll.some((enrollId) => enrollId?.toString() === user.userId);
+        const optimisticEnroll = alreadyEnrolled
+            ? currentEnroll.filter((enrollId) => enrollId?.toString() !== user.userId)
+            : [...currentEnroll, user.userId];
+
+        setenrollMap((prev) => ({
+            ...prev,
+            [postId]: { enroll: optimisticEnroll, enrollCount: optimisticEnroll.length },
+        }));
+
         try {
-            const data = await likePost(postId);
-            setLikesMap((prev) => ({
-                ...prev,
-                [postId]: {
-                    likes: data.likes ?? [],
-                    likesCount: data.likesCount ?? 0,
-                },
-            }));
+            const data = await Promise.race([
+                enrollPost(postId),
+                new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error("Il server non ha risposto. Riprova.")), 8000);
+                }),
+            ]);
+            if (Array.isArray(data?.enroll)) {
+                setenrollMap((prev) => ({
+                    ...prev,
+                    [postId]: {
+                        enroll: data.enroll,
+                        enrollCount: data.enrollCount ?? data.enroll.length,
+                    },
+                }));
+            }
         } catch (err) {
-            console.error("Errore like:", err.message);
+            setenrollMap((prev) => ({ ...prev, [postId]: currentEntry }));
+            toast.error(err?.message || "Non è stato possibile partecipare all'attività");
         } finally {
             setLoadingAction((prev) => ({ ...prev, [postId]: null }));
         }
@@ -295,7 +329,18 @@ export default function PostDetail() {
                                 </div>
                             </div>
 
-                            <button type="button" className={sharedStyles.participateBtn}>Partecipa</button>
+                            <button
+                                type="button"
+                                className={`${sharedStyles.participateBtn} ${hasenrolld(postId) ? sharedStyles.participating : ""}`}
+                                onClick={() => handleenroll(postId)}
+                                disabled={loadingAction[postId] === "enroll"}
+                            >
+                                {loadingAction[postId] === "enroll"
+                                    ? "Attendo..."
+                                    : hasenrolld(postId)
+                                        ? `Partecipi (${enrollMap[postId]?.enrollCount ?? 0})`
+                                        : `Partecipa (${enrollMap[postId]?.enrollCount ?? 0})`}
+                            </button>
 
                            
 
@@ -414,7 +459,6 @@ export default function PostDetail() {
                                                 event.currentTarget.src = SWIMMING_AVATAR;
                                             }}
                                         />
-                                        <button type="button" className={sharedStyles.sideFavorite} aria-label="Salva insegnante">♡</button>
                                     </div>
                                     <button type="button" className={sharedStyles.shareBtn} aria-label="Condividi">↗</button>
                                 </div>

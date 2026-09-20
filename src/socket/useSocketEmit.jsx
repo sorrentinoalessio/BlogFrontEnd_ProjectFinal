@@ -31,14 +31,14 @@ export const useSocketEmit = () => {
     const listPosts = async () => {
         return await emit(actions.LIST_POST);
     };
-    const likePost = async (postId) => emit(actions.LIKE_POST, { postId });
+    const enrollPost = async (postId) => emit(actions.enroll_POST, { postId });
     const addComment = async (postId, comment) => emit(actions.COMMENT_POST, { postId, comment });
     const deleteComment = async (commentId) => emit(actions.COMMENT_DELETE, commentId);
 
     return {
         listTodos,
         listPosts,
-        likePost,
+        enrollPost,
         addComment,
         deleteComment
     };

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { VscCommentDiscussion } from "react-icons/vsc";
+import { toast } from "react-toastify";
 import { getPostPublic } from "../../services/postPublic.service";
 import { useSocketEmit } from "../../../socket/useSocketEmit";
 import styles from "./PostPublicList.module.css";
@@ -34,7 +35,7 @@ export default function PublicPosts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [likesMap, setLikesMap] = useState({});
+  const [enrollMap, setenrollMap] = useState({});
   const [commentsMap, setCommentsMap] = useState({});
   const [openComments, setOpenComments] = useState({});
   const [commentText, setCommentText] = useState({});
@@ -46,7 +47,7 @@ export default function PublicPosts() {
 
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const { likePost, addComment, deleteComment } = useSocketEmit();
+  const { enrollPost, addComment, deleteComment } = useSocketEmit();
 
   // ── Carica i post ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -59,18 +60,18 @@ export default function PublicPosts() {
 
         setPosts(data);
 
-        const initialLikes = {};
+        const initialenroll = {};
 
         data.forEach((p) => {
-          initialLikes[p._id] = {
-            likes: Array.isArray(p.likes) ? p.likes : [],
-            likesCount:
-              p.likesCount ??
-              (Array.isArray(p.likes) ? p.likes.length : 0),
+          initialenroll[p._id] = {
+            enroll: Array.isArray(p.enroll) ? p.enroll : [],
+            enrollCount:
+              p.enrollCount ??
+              (Array.isArray(p.enroll) ? p.enroll.length : 0),
           };
         });
 
-        setLikesMap(initialLikes);
+        setenrollMap(initialenroll);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -80,32 +81,51 @@ export default function PublicPosts() {
     fetchPosts();
   }, []);
 
-  // ── Helper: utente ha già messo like? ─────────────────────────────────────
-  const hasLiked = useCallback(
+  // ── Helper: utente ha già messo enroll? ─────────────────────────────────────
+  const hasenrolld = useCallback(
     (postId) => {
       if (!user?.userId) return false;
-      const entry = likesMap[postId];
+      const entry = enrollMap[postId];
       if (!entry) return false;
-      return entry.likes.some((id) => id?.toString() === user.userId);
+      return entry.enroll.some((id) => id?.toString() === user.userId);
     },
-    [likesMap, user]
+    [enrollMap, user]
   );
 
-  // ── Like toggle ────────────────────────────────────────────────────────────
-  const handleLike = async (postId) => {
-    if (!user?.accessToken) return;
-    setLoadingAction((prev) => ({ ...prev, [postId]: "like" }));
+  // ── enroll toggle ────────────────────────────────────────────────────────────
+  const handleenroll = async (postId) => {
+    if (!user?.accessToken) {
+      toast.info("Accedi per partecipare all'attività");
+      navigate("/login");
+      return;
+    }
+    setLoadingAction((prev) => ({ ...prev, [postId]: "enroll" }));
+    const currentEntry = enrollMap[postId] ?? { enroll: [], enrollCount: 0 };
+    const currentEnroll = Array.isArray(currentEntry.enroll) ? currentEntry.enroll : [];
+    const alreadyEnrolled = currentEnroll.some((enrollId) => enrollId?.toString() === user.userId);
+    const optimisticEnroll = alreadyEnrolled
+      ? currentEnroll.filter((enrollId) => enrollId?.toString() !== user.userId)
+      : [...currentEnroll, user.userId];
+
+    setenrollMap((prev) => ({
+      ...prev,
+      [postId]: { enroll: optimisticEnroll, enrollCount: optimisticEnroll.length },
+    }));
+
     try {
-      const data = await likePost(postId);
-      setLikesMap((prev) => ({
-        ...prev,
-        [postId]: {
-          likes: data.likes ?? [],
-          likesCount: data.likesCount ?? 0,
-        },
-      }));
+      const data = await enrollPost(postId);
+      if (Array.isArray(data?.enroll)) {
+        setenrollMap((prev) => ({
+          ...prev,
+          [postId]: {
+            enroll: data.enroll,
+            enrollCount: data.enrollCount ?? data.enroll.length,
+          },
+        }));
+      }
     } catch (err) {
-      console.error("Errore like:", err.message);
+      setenrollMap((prev) => ({ ...prev, [postId]: currentEntry }));
+      toast.error(err?.message || "Non è stato possibile partecipare all'attività");
     } finally {
       setLoadingAction((prev) => ({ ...prev, [postId]: null }));
     }
@@ -188,9 +208,18 @@ export default function PublicPosts() {
     });
   };
 
-  const openPost = (postId, event) => {
+  const openPost = (postId, event, post) => {
     if (event.target.closest("button, textarea, input, select, a")) return;
-    navigate(`/user/post/${postId}`);
+    const enrollData = enrollMap[postId] ?? { enroll: [], enrollCount: 0 };
+    navigate(`/user/post/${postId}`, {
+      state: {
+        post: {
+          ...post,
+          enroll: enrollData.enroll,
+          enrollCount: enrollData.enrollCount,
+        },
+      },
+    });
   };
 
   const visiblePosts = useMemo(() => {
@@ -221,11 +250,11 @@ export default function PublicPosts() {
       );
     }
 
-    if (activeTab === "liked") {
+    if (activeTab === "enrolld") {
       return sortedPosts.sort(
         (firstPost, secondPost) =>
-          (likesMap[secondPost._id]?.likesCount ?? secondPost.likesCount ?? secondPost.likes?.length ?? 0) -
-          (likesMap[firstPost._id]?.likesCount ?? firstPost.likesCount ?? firstPost.likes?.length ?? 0)
+          (enrollMap[secondPost._id]?.enrollCount ?? secondPost.enrollCount ?? secondPost.enroll?.length ?? 0) -
+          (enrollMap[firstPost._id]?.enrollCount ?? firstPost.enrollCount ?? firstPost.enroll?.length ?? 0)
       );
     }
 
@@ -240,7 +269,7 @@ export default function PublicPosts() {
     }
 
     return sortedPosts;
-  }, [activeTab, likesMap, posts, searchText, sortDirection]);
+  }, [activeTab, enrollMap, posts, searchText, sortDirection]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
   if (loading) {
@@ -299,7 +328,7 @@ export default function PublicPosts() {
         {[
           { value: "all", label: "Tutti" },
           { value: "recent", label: "Più recenti" },
-          { value: "liked", label: "Più apprezzati" },
+          { value: "enrolld", label: "Più partecipati" },
           { value: "level", label: sortDirection === "asc" ? "Level ↑" : "Level ↓" },
         ].map((tab) => (
           <button
@@ -327,11 +356,11 @@ export default function PublicPosts() {
         <ul className={styles.list}>
           {visiblePosts.map((post) => {
             const postId = post._id;
-            const likeData = likesMap[postId] ?? { likes: [], likesCount: 0 };
+            const enrollData = enrollMap[postId] ?? { enroll: [], enrollCount: 0 };
             const comments = commentsMap[postId] ?? post.comments ?? [];
             const isOpen = !!openComments[postId];
-            const liked = hasLiked(postId);
-            const isLiking = loadingAction[postId] === "like";
+            const enrolld = hasenrolld(postId);
+            const isEnrolling = loadingAction[postId] === "enroll";
             const isCommenting = loadingAction[postId] === "comment";
             const levelScore = getLevelScore(post);
 
@@ -339,10 +368,10 @@ export default function PublicPosts() {
               <li
                 key={postId}
                 className={styles.card}
-                onClick={(event) => openPost(postId, event)}
+                onClick={(event) => openPost(postId, event, post)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
-                    openPost(postId, event);
+                    openPost(postId, event, post);
                   }
                 }}
                 role="link"
@@ -357,16 +386,6 @@ export default function PublicPosts() {
                     }
                     alt={post.title || "Insegnante di nuoto"}
                   />
-                  <button
-                    type="button"
-                    className={`${styles.favoriteBtn} ${liked ? styles.favoriteActive : ""}`}
-                    onClick={() => handleLike(postId)}
-                    disabled={!user?.accessToken || isLiking}
-                    aria-label={liked ? "Rimuovi like" : "Metti like"}
-                    title={user?.accessToken ? "Metti like" : "Accedi per mettere like"}
-                  >
-                    {liked ? "♥" : "♡"}
-                  </button>
                 </div>
 
                 <div className={styles.cardContent}>
@@ -384,16 +403,11 @@ export default function PublicPosts() {
                 <div className={styles.actions}>
                   <button
                     type="button"
-                    className={`${styles.likeBtn} ${liked ? styles.liked : ""}`}
-                    onClick={() => handleLike(postId)}
-                    disabled={!user?.accessToken || isLiking}
-                    title={
-                      user?.accessToken
-                        ? liked ? "Rimuovi like" : "Metti like"
-                        : "Accedi per mettere like"
-                    }
+                    className={`${styles.participateBtn} ${enrolld ? styles.participating : ""}`}
+                    onClick={() => handleenroll(postId)}
+                    disabled={isEnrolling}
                   >
-                    {liked ? "❤️" : "🤍"} {likeData.likesCount}
+                    {enrolld ? "Partecipi" : "Partecipa"} ({enrollData.enrollCount})
                   </button>
 
                   <span className={styles.commentsBtn} aria-label={`Commenti: ${comments.length}`}>
