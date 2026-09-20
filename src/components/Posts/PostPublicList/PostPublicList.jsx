@@ -42,6 +42,7 @@ export default function PublicPosts() {
   const [editingComment, setEditingComment] = useState({}); // { [commentId]: string }
   const [activeTab, setActiveTab] = useState("all");
   const [sortDirection, setSortDirection] = useState("desc");
+  const [searchText, setSearchText] = useState("");
 
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -193,7 +194,24 @@ export default function PublicPosts() {
   };
 
   const visiblePosts = useMemo(() => {
-    const sortedPosts = [...posts];
+    const normalizedSearch = searchText.trim().toLocaleLowerCase("it-IT");
+    const filteredPosts = normalizedSearch
+      ? posts.filter((post) => {
+        const searchableText = [
+          post.title,
+          post.description,
+          post.ownerName,
+          post.location,
+          ...(Array.isArray(post.tag) ? post.tag.map((tag) => typeof tag === "string" ? tag : tag?.tag) : []),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase("it-IT");
+
+        return searchableText.includes(normalizedSearch);
+      })
+      : posts;
+    const sortedPosts = [...filteredPosts];
 
     if (activeTab === "recent") {
       return sortedPosts.sort(
@@ -222,7 +240,7 @@ export default function PublicPosts() {
     }
 
     return sortedPosts;
-  }, [activeTab, likesMap, posts, sortDirection]);
+  }, [activeTab, likesMap, posts, searchText, sortDirection]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
   if (loading) {
@@ -252,6 +270,31 @@ export default function PublicPosts() {
 
   return (
     <section className={styles.page}>
+      <div className={styles.searchBox} id="search">
+        <label className={styles.searchLabel} htmlFor="post-search">Cerca un’attività</label>
+        <div className={styles.searchField}>
+          <span className={styles.searchIcon} aria-hidden="true">⌕</span>
+          <input
+            id="post-search"
+            type="search"
+            value={searchText}
+            onChange={(event) => setSearchText(event.target.value)}
+            placeholder="Cerca nel titolo, nella descrizione o nei tag"
+            className={styles.searchInput}
+          />
+          {searchText && (
+            <button
+              type="button"
+              className={styles.clearSearch}
+              aria-label="Cancella ricerca"
+              onClick={() => setSearchText("")}
+            >
+              ×
+            </button>
+          )}
+        </div>
+      </div>
+
       <div className={styles.tabs} role="tablist" aria-label="Visualizzazione post">
         {[
           { value: "all", label: "Tutti" },
@@ -280,6 +323,7 @@ export default function PublicPosts() {
         ))}
       </div>
 
+      {visiblePosts.length ? (
       <ul className={styles.list}>
         {visiblePosts.map((post) => {
           const postId = post._id;
@@ -540,6 +584,11 @@ export default function PublicPosts() {
           );
         })}
       </ul>
+      ) : (
+        <div className={styles.status}>
+          <p>Nessun post corrisponde alla ricerca.</p>
+        </div>
+      )}
     </section>
   );
 }

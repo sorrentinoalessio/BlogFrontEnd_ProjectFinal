@@ -5,10 +5,16 @@ import { useNavigate } from "react-router-dom";
 import styles from "./PostList.module.css";
 
 const STEP = 5;
+const statusOptions = [
+    { value: "draft", label: "Bozza" },
+    { value: "public", label: "Pubblicato" },
+    { value: "archived", label: "Archiviato" },
+];
 
 const PostList = ({ posts = [], user, onPostStatusChange }) => {
     const [openComments, setOpenComments] = useState({});
     const [visibleCount, setVisibleCount] = useState(STEP);
+    const [openStatusId, setOpenStatusId] = useState(null);
     const [localPosts, setLocalPosts] = useState(posts);
     const loaderRef = useRef(null);
     const navigate = useNavigate();
@@ -131,19 +137,41 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
                             </div>
 
                             <div className={styles.statusRow}>
-                                <label htmlFor={`status-${post._id}`} className={styles.statusLabel}>
+                                <span className={styles.statusLabel} id={`status-${post._id}`}>
                                     Stato
-                                </label>
-                                <select
-                                    id={`status-${post._id}`}
-                                    className={`${styles.statusSelect} ${statusClass}`}
-                                    value={post.status}
-                                    onChange={(e) => changeStatus(post._id, e.target.value)}
-                                >
-                                    <option value="draft">Bozza</option>
-                                    <option value="public">Pubblicato</option>
-                                    <option value="archived">Archiviato</option>
-                                </select>
+                                </span>
+                                <div className={styles.statusSelect}>
+                                    <button
+                                        type="button"
+                                        className={`${styles.statusTrigger} ${statusClass}`}
+                                        aria-expanded={openStatusId === post._id}
+                                        aria-haspopup="listbox"
+                                        aria-labelledby={`status-${post._id}`}
+                                        onClick={() => setOpenStatusId((current) => current === post._id ? null : post._id)}
+                                    >
+                                        {statusOptions.find((option) => option.value === post.status)?.label}
+                                        <span className={styles.statusChevron} aria-hidden="true" />
+                                    </button>
+                                    {openStatusId === post._id && (
+                                        <div className={styles.statusMenu} role="listbox" aria-labelledby={`status-${post._id}`}>
+                                            {statusOptions.map((option) => (
+                                                <button
+                                                    key={option.value}
+                                                    type="button"
+                                                    role="option"
+                                                    aria-selected={post.status === option.value}
+                                                    className={`${styles.statusOption} ${post.status === option.value ? styles.statusOptionActive : ""}`}
+                                                    onClick={() => {
+                                                        setOpenStatusId(null);
+                                                        changeStatus(post._id, option.value);
+                                                    }}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             <div className={styles.meta}>

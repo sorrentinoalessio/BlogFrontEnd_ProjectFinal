@@ -51,20 +51,12 @@ const Header = () => {
           <Link to="/" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Home</Link>
           <Link to="/posts" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Le mie attività</Link>
           <Link to="/posts/addPost" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Aggiungi attività</Link>
+          <Link to="/login" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Accedi</Link>
+          <Link to="/registration" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Registrati</Link>
           <Link to="/profile" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Il mio Profilo</Link>
         </nav>
 
         <div className={styles.actions}>
-          <button
-            type="button"
-            onClick={() => {
-              setIsMenuOpen(false);
-              navigate("/posts/addPost");
-            }}
-            className={styles.secondaryBtn}
-          >
-            Pubblica
-          </button>
           {isLoggedIn ? (
 
             <button type="button" onClick={handleLogout} className={styles.primaryBtn}>

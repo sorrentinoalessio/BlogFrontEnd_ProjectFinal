@@ -153,29 +153,45 @@
   }
 
   .nav {
-    display: none;
+    display: flex;
     position: absolute;
-    top: calc(100% - 1px);
-    left: 12px;
-    right: 12px;
+    top: 100%;
+    bottom: auto;
+    left: 0;
+    width: 100vw;
+    height: calc(100dvh - 76px);
     z-index: 30;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    justify-content: center;
     gap: 4px;
     padding: 12px;
     border: 1px solid rgba(20, 20, 20, 0.08);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow: 0 14px 28px rgba(20, 20, 20, 0.12);
+    border-top: 0;
+    border-left: 0;
+    border-radius: 0 18px 18px 0;
+    background: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 14px 28px rgba(20, 20, 20, 0.1);
+    overflow-y: auto;
+    transform: translateX(-105%);
+    transition: transform 0.28s ease;
+    pointer-events: none;
   }
 
   .navOpen {
-    display: flex;
+    transform: translateX(0);
+    pointer-events: auto;
   }
 
   .navLink {
+    width: min(320px, 80vw);
     padding: 12px 14px;
     border-radius: 10px;
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: left;
   }
 
   .menuButton {
@@ -208,7 +224,7 @@
   .primaryBtn {
     min-height: 40px;
     padding: 0 14px;
-    font-size: 0.92rem;
+    font-size: 16px;
   }
 
   .brandTagline {
