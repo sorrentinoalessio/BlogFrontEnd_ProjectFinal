@@ -70,7 +70,7 @@ const EditPost = () => {
         title: "",
         description: "",
         status: "draft",
-        datePost: "",
+        eventDate: "",
         locality: "",
         tagText: "",
         imagePost: "",
@@ -91,7 +91,7 @@ const EditPost = () => {
     const [mapSearchError, setMapSearchError] = useState("");
 
     const calendarDays = getCalendarDays(calendarMonth);
-    const selectedDate = form.datePost ? new Date(`${form.datePost}T00:00:00`) : null;
+    const selectedDate = form.eventDate ? new Date(`${form.eventDate}T00:00:00`) : null;
     const monthLabel = calendarMonth.toLocaleDateString("it-IT", {
         month: "long",
         year: "numeric",
@@ -106,7 +106,7 @@ const EditPost = () => {
             title: post.title ?? "",
             description: post.description ?? "",
             status: post.status ?? "draft",
-            datePost: post.creationDate
+            eventDate: post.creationDate
                 ? new Date(post.creationDate).toISOString().slice(0, 10)
                 : "",
             locality: post.locality ?? post.location ?? "",
@@ -203,7 +203,7 @@ const EditPost = () => {
         formData.append("status", form.status);
         formData.append("tag", JSON.stringify(tags));
         if (form.locality.trim()) formData.append("locality", form.locality.trim());
-        if (form.datePost?.trim()) formData.append("datePost", form.datePost.trim());
+        if (form.eventDate?.trim()) formData.append("eventDate", form.eventDate.trim());
         if (form.imagePost?.trim()) formData.append("imagePost", form.imagePost.trim());
         if (form.uploadedFile) formData.append("uploadedFile", form.uploadedFile);
 
@@ -342,12 +342,12 @@ const EditPost = () => {
                         {errors.description && <small className={styles.error}>{errors.description}</small>}
                     </div>
                      <div className={styles.field}>
-                            <label className={styles.label} htmlFor="datePost">Data appuntamento*</label>
+                            <label className={styles.label} htmlFor="eventDate">Data appuntamento*</label>
                             <div className={styles.datePicker}>
                                 <button
-                                    id="datePost"
+                                    id="eventDate"
                                     type="button"
-                                    className={`${styles.dateTrigger} ${form.datePost ? styles.dateSelected : ""}`}
+                                    className={`${styles.dateTrigger} ${form.eventDate ? styles.dateSelected : ""}`}
                                     aria-expanded={dateOpen}
                                     aria-haspopup="dialog"
                                     onClick={() => setDateOpen((open) => !open)}
@@ -388,7 +388,7 @@ const EditPost = () => {
                                                     type="button"
                                                     className={`${styles.calendarDay} ${selectedDate && toDateValue(selectedDate) === toDateValue(date) ? styles.calendarDaySelected : ""}`}
                                                     onClick={() => {
-                                                        setForm((prev) => ({ ...prev, datePost: toDateValue(date) }));
+                                                        setForm((prev) => ({ ...prev, eventDate: toDateValue(date) }));
                                                         setDateOpen(false);
                                                     }}
                                                 >
@@ -396,12 +396,12 @@ const EditPost = () => {
                                                 </button>
                                             ) : <span key={`empty-${index}`} />)}
                                         </div>
-                                        {form.datePost && (
+                                        {form.eventDate && (
                                             <button
                                                 type="button"
                                                 className={styles.clearDate}
                                                 onClick={() => {
-                                                    setForm((prev) => ({ ...prev, datePost: "" }));
+                                                    setForm((prev) => ({ ...prev, eventDate: "" }));
                                                     setDateOpen(false);
                                                 }}
                                             >
