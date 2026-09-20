@@ -22,9 +22,15 @@ export const SocketProvider = ({ children }) => {
     useEffect(() => {
         if (!isAuthenticated || !accessToken) return;
 
-        const newSocket = socketIOClient(`${import.meta.env.VITE_API_URL}/blog`, {
+        const newSocket = socketIOClient(window.location.origin, {
+            path: '/api/socket.io',
             transports: ['websocket'],
-            query: { version: 'v1', platform: 'web', appVersion: '1', lang: 'it' },
+            query: {
+                version: 'v1',
+                platform: 'web',
+                appVersion: '1',
+                lang: 'it'
+            },
             auth: (cb) => {
                 cb({ accessToken: userRef.current?.accessToken });
             }
@@ -47,7 +53,7 @@ export const SocketProvider = ({ children }) => {
             if (err.message.includes('scaduta')) {
                 logout();
                 toast.error("Sessione scaduta. Effettua nuovamente il login.");
-                 navigate("/login");
+                navigate("/login");
             }
         });
 
