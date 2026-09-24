@@ -466,7 +466,6 @@ export default function PostDetail() {
                                                             <span className={sharedStyles.avatar}>{(c.authorName ?? c.author?.name ?? "U").charAt(0).toUpperCase()}</span>
                                                             <span className={sharedStyles.commentAuthor}>{c.authorName ?? c.author?.name ?? "Utente"}</span>
                                                         </div>
-                                                        <span className={sharedStyles.commentStars}>★ 5</span>
                                                     </div>
 
                                                     {isEditing ? (

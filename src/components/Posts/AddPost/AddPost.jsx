@@ -18,6 +18,8 @@ const statusOptions = [
     { value: "delete", label: "Eliminato" },
 ];
 
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
 const weekDays = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
 
 const toDateValue = (date) => {
@@ -95,6 +97,13 @@ const AddPost = () => {
         const { name, value, files } = e.target;
 
         if (files && files.length > 0) {
+            if (name === "uploadedFile" && files[0].size > MAX_IMAGE_SIZE) {
+                e.target.value = "";
+                setErrors((prev) => ({ ...prev, uploadedFile: "Immagine troppo grande. Scegli un file più piccolo." }));
+                return;
+            }
+
+            setErrors((prev) => ({ ...prev, uploadedFile: "" }));
             setForm((prev) => ({ ...prev, [name]: files[0] }));
             return;
         }
@@ -456,6 +465,7 @@ const AddPost = () => {
                             accept="image/*"
                             onChange={onChange}
                         />
+                        {errors.uploadedFile && <small className={styles.error}>{errors.uploadedFile}</small>}
                     </div>
 
                     <div className={styles.actions}>

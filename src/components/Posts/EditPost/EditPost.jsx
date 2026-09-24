@@ -10,6 +10,8 @@ import { getPostDetails } from "../../services/postDetails.service.js";
 import "leaflet/dist/leaflet.css";
 import { CircleMarker, MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
 
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
 const normalizeImageUrl = (value) => {
     if (!value) return "";
     if (/^https?:\/\//i.test(value)) return value;
@@ -158,6 +160,13 @@ const EditPost = () => {
 
         if (files && files.length > 0) {
             const selectedFile = files[0];
+            if (name === "uploadedFile" && selectedFile.size > MAX_IMAGE_SIZE) {
+                e.target.value = "";
+                setErrors((prev) => ({ ...prev, uploadedFile: "Immagine troppo grande. Scegli un file più piccolo." }));
+                return;
+            }
+
+            setErrors((prev) => ({ ...prev, uploadedFile: "" }));
             setForm((prev) => ({ ...prev, [name]: selectedFile, imagePost: "" }));
             setPreviewImage(URL.createObjectURL(selectedFile));
             return;
@@ -477,6 +486,7 @@ const EditPost = () => {
                             accept="image/*"
                             onChange={onChange}
                         />
+                        {errors.uploadedFile && <small className={styles.error}>{errors.uploadedFile}</small>}
                     </div>
 
                     <div className={styles.actions}>
