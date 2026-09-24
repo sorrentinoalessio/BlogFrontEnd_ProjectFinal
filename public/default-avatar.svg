@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title>Avatar standard del nuoto</title>
+  <rect width="256" height="256" fill="#ffffff" />
+  <circle cx="145" cy="166" r="20" fill="#000000" />
+  <path d="M117 171c-13-7-27-18-33-29-7-14-4-23 7-29 14-7 30-13 46-18-11 12-26 20-40 29 9 9 18 17 27 24 8 7 7 18-7 23Z" fill="#000000" />
+  <path d="M14 185c17 10 32 15 47 8 14-6 24-18 39-17 16 1 31 14 47 18 18 4 31-6 46-14 14-8 25-8 39-2 16 7 24 15 40 19" fill="none" stroke="#000000" stroke-width="5" stroke-linecap="round" />
+</svg>
