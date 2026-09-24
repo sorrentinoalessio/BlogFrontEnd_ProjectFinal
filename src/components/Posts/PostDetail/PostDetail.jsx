@@ -6,10 +6,10 @@ import sharedStyles from "../PostPublicList/PostPublicList.module.css";
 import detailStyles from "./PostDetail.module.css";
 import { getPostDetails } from "../../services/postDetails.service.js";
 import { getPostPublic } from "../../services/postPublic.service.js";
+import { getWeatherForDate } from "../../services/weather.service.js";
 import { toast } from "react-toastify";
 
-const SWIMMING_AVATAR =
-    "https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=800&q=85";
+const SWIMMING_AVATAR = "/default-avatar.svg";
 
 const resolveAvatarUrl = (avatar) => {
     if (!avatar) return "";
@@ -26,6 +26,46 @@ const resolveAvatarUrl = (avatar) => {
     return filename
         ? `${import.meta.env.VITE_API_URL}/uploads/${filename}?t=${Date.now()}`
         : "";
+};
+
+const weatherLabels = {
+    0: "Sereno",
+    1: "Prevalentemente sereno",
+    2: "Parzialmente nuvoloso",
+    3: "Nuvoloso",
+    45: "Nebbia",
+    48: "Nebbia con brina",
+    51: "Pioviggine leggera",
+    53: "Pioviggine",
+    55: "Pioviggine intensa",
+    61: "Pioggia leggera",
+    63: "Pioggia",
+    65: "Pioggia intensa",
+    71: "Neve leggera",
+    73: "Neve",
+    75: "Neve intensa",
+    80: "Rovesci leggeri",
+    81: "Rovesci",
+    82: "Rovesci intensi",
+    95: "Temporale",
+    96: "Temporale con grandine",
+    99: "Temporale con grandine intensa",
+};
+
+const getWindDirectionLabel = (degrees) => {
+    if (degrees === null || degrees === undefined || Number.isNaN(Number(degrees))) return "-";
+    const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+    return `${directions[Math.round(Number(degrees) / 45) % 8]} (${Math.round(Number(degrees))}°)`;
+};
+
+const parseWeather = (value) => {
+    if (!value) return null;
+    if (typeof value === "object") return value;
+    try {
+        return JSON.parse(value);
+    } catch {
+        return null;
+    }
 };
 
 const resolvePostImage = (post) => {
@@ -47,6 +87,18 @@ const getMapEmbedUrl = (locality) => {
     const delta = 0.025;
     return `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - delta},${latitude - delta},${longitude + delta},${latitude + delta}&layer=mapnik&marker=${latitude},${longitude}`;
 };
+
+const getPostCoordinates = (post) => {
+    const latitude = Number(post.latitude ?? post.coordinates?.latitude ?? post.coordinates?.[0]);
+    const longitude = Number(post.longitude ?? post.coordinates?.longitude ?? post.coordinates?.[1]);
+    if (Number.isFinite(latitude) && Number.isFinite(longitude)) return [latitude, longitude];
+
+    const locality = String(post.locality ?? post.location ?? "");
+    const match = locality.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
+    return match ? [Number(match[1]), Number(match[2])] : null;
+};
+
+const getPostEventDate = (post) => post.eventDate || post.appointmentDate || post.creationDate || "";
 
 export default function PostDetail() {
     const { id } = useParams(); // legge :id da /user/post/:id
@@ -84,10 +136,28 @@ export default function PostDetail() {
                         enrollCount: navigationPost.enrollCount ?? post.enrollCount,
                     };
                 }); // mantiene subito il conteggio aggiornato dalla lista pubblica
-                setPosts(postArray);
+                const hydratedPosts = await Promise.all(postArray.map(async (post) => {
+                    if (parseWeather(post.weather)) return post;
+
+                    const coordinates = getPostCoordinates(post);
+                    const date = String(getPostEventDate(post)).slice(0, 10);
+                    if (!coordinates || !date) return post;
+
+                    try {
+                        const weather = await getWeatherForDate({
+                            latitude: coordinates[0],
+                            longitude: coordinates[1],
+                            date,
+                        });
+                        return { ...post, weather };
+                    } catch {
+                        return post;
+                    }
+                }));
+                setPosts(hydratedPosts);
                 const initialenroll = {};
                 const initialComments = {};
-                postArray.forEach((p) => {
+                hydratedPosts.forEach((p) => {
                     initialenroll[p._id] = {
                         enroll: Array.isArray(p.enroll) ? p.enroll : [],
                         enrollCount: p.enrollCount ?? (Array.isArray(p.enroll) ? p.enroll.length : 0),
@@ -294,6 +364,9 @@ export default function PostDetail() {
                     (Array.isArray(profile.posts)
                         ? profile.posts.filter((profilePost) => profilePost.status === "public").length
                         : "-");
+                    const weather = parseWeather(post.weather);
+                    const atmospheric = weather?.atmospheric;
+                    const marine = weather?.marine;
 
                 return (
                     <article key={postId} className={sharedStyles.singlePostLayout}>
@@ -337,6 +410,28 @@ export default function PostDetail() {
                                 </div>
                                 
                             </div>
+
+                            {weather && (
+                                <section className={sharedStyles.weatherCard} aria-label="Meteo dell'attività">
+                                    <div className={sharedStyles.weatherHeader}>
+                                        <span className={sharedStyles.weatherIcon} aria-hidden="true">☁</span>
+                                        <div>
+                                            <strong>Meteo del giorno</strong>
+                                            <span>{weather.date || post.eventDate || "Data appuntamento"}</span>
+                                        </div>
+                                    </div>
+                                    <div className={sharedStyles.weatherGrid}>
+                                        <div><span>Condizioni</span><strong>{weatherLabels[atmospheric?.weatherCode] || "-"}</strong></div>
+                                        <div><span>Temperatura</span><strong>{atmospheric?.temperatureMin ?? "-"}° / {atmospheric?.temperatureMax ?? "-"}°C</strong></div>
+                                        <div><span>Pioggia</span><strong>{atmospheric?.precipitationProbability ?? "-"}%</strong></div>
+                                        <div><span>Vento</span><strong>{atmospheric?.windSpeedMax ?? "-"} km/h</strong></div>
+                                        <div><span>Direzione vento</span><strong>{getWindDirectionLabel(atmospheric?.windDirection)}</strong></div>
+                                        <div><span>Onde max</span><strong>{marine?.waveHeightMax ?? "-"} m</strong></div>
+                                        <div><span>Periodo onde</span><strong>{marine?.wavePeriodMax ?? "-"} s</strong></div>
+                                        <div><span>Temperatura acqua</span><strong>{marine?.seaSurfaceTemperature ?? "-"}°C</strong></div>
+                                    </div>
+                                </section>
+                            )}
 
                             <button
                                 type="button"

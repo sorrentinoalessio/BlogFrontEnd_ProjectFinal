@@ -17,7 +17,7 @@ const Footer = () => {
             </span>
             <span>Swimigo</span>
           </Link>
-          <p>Allenati in compagnia</p>
+          <p>Organizza i tuoi allenamenti</p>
         </div>
 
         <nav className={styles.links} aria-label="Link del footer">

@@ -531,8 +531,9 @@
   align-items: flex-start;
   gap: 16px;
   padding: 20px 22px;
+  border: 1px solid rgba(71, 123, 131, 0.2);
   border-radius: 22px;
-  background: #e8e5ff;
+  background: linear-gradient(135deg, rgba(224, 245, 246, 0.92), rgba(236, 242, 255, 0.92));
   color: #383838;
 }
 
@@ -546,19 +547,20 @@
 }
 
 .badgeIcon {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #b0d6ff, #7d9dff);
-  color: white;
   display: grid;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
   place-items: center;
+  border-radius: 50%;
+  background: #477b83;
+  color: #fff;
   font-size: 1.1rem;
 }
 
 .badgeCard strong {
   display: block;
+  color: #173f46;
   font-size: 1.15rem;
   line-height: 1.3;
   margin-bottom: 7px;
@@ -566,8 +568,74 @@
 
 .badgeCard p {
   margin: 0;
+  color: #5c7074;
   line-height: 1.55;
   font-size: 1.02rem;
+}
+
+.weatherCard {
+  max-width: 920px;
+  margin-top: 18px;
+  padding: 20px 22px;
+  border: 1px solid rgba(71, 123, 131, 0.2);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(224, 245, 246, 0.92), rgba(236, 242, 255, 0.92));
+}
+
+.weatherHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.weatherIcon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: #477b83;
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.weatherHeader strong,
+.weatherHeader span {
+  display: block;
+}
+
+.weatherHeader strong {
+  color: #173f46;
+  font-size: 1.15rem;
+}
+
+.weatherHeader span {
+  margin-top: 3px;
+  color: #5c7074;
+  font-size: 0.86rem;
+}
+
+.weatherGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.weatherGrid div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.weatherGrid span {
+  color: #5c7074;
+  font-size: 0.78rem;
+}
+
+.weatherGrid strong {
+  color: #173f46;
+  font-size: 0.95rem;
 }
 
 .bioSection {

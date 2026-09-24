@@ -14,12 +14,14 @@ const RegistrationForm = () => {
         email: "",
         password: "",
         confermaPassword: "",
+        timeForHundredMeters: "",
     });
 
     const [nomeError, setNomeError] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const [confermaPasswordError, setConfermaPasswordError] = useState("");
+    const [timeForHundredMetersError, setTimeForHundredMetersError] = useState("");
     const [serverError, setServerError] = useState("");
 
     const handleChange = (e) => {
@@ -32,6 +34,7 @@ const RegistrationForm = () => {
         setEmailError("");
         setPasswordError("");
         setConfermaPasswordError("");
+        setTimeForHundredMetersError("");
         setServerError("");
         let hasError = false;
 
@@ -60,6 +63,10 @@ const RegistrationForm = () => {
             setConfermaPasswordError("Le password non coincidono");
             hasError = true;
         }
+        if (!formValue.timeForHundredMeters || Number(formValue.timeForHundredMeters) <= 0) {
+            setTimeForHundredMetersError("Inserisci un tempo valido in secondi");
+            hasError = true;
+        }
 
         if (hasError) {
             return;
@@ -70,6 +77,7 @@ const RegistrationForm = () => {
                 name: formValue.nome,
                 email: formValue.email,
                 password: formValue.password,
+                timeForHundredMeters: Number(formValue.timeForHundredMeters),
             });
             toast.success("registrazione avvenuta con successo, conferma la tua email");
             navigate("/login");
@@ -92,6 +100,8 @@ const RegistrationForm = () => {
     const confermaPasswordOk =
         formValue.confermaPassword.trim() !== "" &&
         formValue.password === formValue.confermaPassword;
+
+    const timeForHundredMetersOk = Number(formValue.timeForHundredMeters) > 0;
 
     return (
         <Card title="Registrati">
@@ -144,6 +154,18 @@ const RegistrationForm = () => {
                         status={confermaPasswordError ? "error" : confermaPasswordOk ? "success" : ""}
                         onChange={handleChange}
                         htmlFor="confermaPassword"
+                    />
+                    <Input
+                        id="timeForHundredMeters"
+                        label="Tempo per 100 metri (minuti)*"
+                        type="number"
+                        name="timeForHundredMeters"
+                        placeholder="es. 1.05"
+                        value={formValue.timeForHundredMeters}
+                        error={timeForHundredMetersError}
+                        status={timeForHundredMetersError ? "error" : timeForHundredMetersOk ? "success" : ""}
+                        onChange={handleChange}
+                        htmlFor="timeForHundredMeters"
                     />
 
                     <button type="submit" className={styles.submitButton}>

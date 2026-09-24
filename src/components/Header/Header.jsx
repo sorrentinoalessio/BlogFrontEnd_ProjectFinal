@@ -31,7 +31,7 @@ const Header = () => {
           </span>
           <span className={styles.brandCopy}>
             <span className={styles.brandText}>Swimigo</span>
-            <span className={styles.brandTagline}>Allenati in compagnia</span>
+            <span className={styles.brandTagline}>Organizza i tuoi allenamenti</span>
           </span>
         </Link>
 
@@ -51,8 +51,12 @@ const Header = () => {
           <Link to="/" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Home</Link>
           <Link to="/posts" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Le mie attività</Link>
           <Link to="/posts/addPost" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Aggiungi attività</Link>
-          <Link to="/login" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Accedi</Link>
-          <Link to="/registration" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Registrati</Link>
+          {!isLoggedIn && (
+            <>
+              <Link to="/login" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Accedi</Link>
+              <Link to="/registration" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Registrati</Link>
+            </>
+          )}
           <Link to="/profile" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Il mio Profilo</Link>
         </nav>
 

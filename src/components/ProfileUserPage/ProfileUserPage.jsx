@@ -10,8 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { userSelectors, setUser } from "../../reducers/user.slice";
 
-const DEFAULT_AVATAR =
-    "https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=800&q=85";
+const DEFAULT_AVATAR = "/default-avatar.svg";
 
 const ProfileUserPage = () => {
     const navigate = useNavigate();
@@ -22,7 +21,7 @@ const ProfileUserPage = () => {
         nome: "",
         timeForHundredMeters: "",
         status: "",
-        avatar: "",
+        avatar: DEFAULT_AVATAR,
         avatarFile: null,
         avatarRemoved: false,
     });
@@ -111,7 +110,7 @@ const ProfileUserPage = () => {
                         data.timeForHundredMeters || data?.user?.timeForHundredMeters || prev.timeForHundredMeters,
                     email: data.email || data?.user?.email || prev.email,
                     status: data.status || data?.user?.status || prev.status,
-                    avatar: currentAvatar,
+                    avatar: currentAvatar || DEFAULT_AVATAR,
                     avatarRemoved: false,
                 }));
             } catch (error) {
@@ -182,6 +181,13 @@ const ProfileUserPage = () => {
         if (!confirmed) return;
 
         setServerError("");
+        const previousAvatar = formValue.avatar;
+        setFormValue((prev) => ({
+            ...prev,
+            avatar: DEFAULT_AVATAR,
+            avatarFile: null,
+            avatarRemoved: true,
+        }));
 
         try {
             const defaultAvatarResponse = await fetch(DEFAULT_AVATAR);
@@ -192,8 +198,8 @@ const ProfileUserPage = () => {
             const defaultAvatarBlob = await defaultAvatarResponse.blob();
             const defaultAvatarFile = new File(
                 [defaultAvatarBlob],
-                "default-swimming-avatar.jpg",
-                { type: defaultAvatarBlob.type || "image/jpeg" }
+                "default-avatar.svg",
+                { type: defaultAvatarBlob.type || "image/svg+xml" }
             );
             const uploadResponse = await uploadAvatar(user?.accessToken, defaultAvatarFile);
             const storedAvatar = resolveAvatarUrl(
@@ -225,6 +231,12 @@ const ProfileUserPage = () => {
             }));
             toast.success("Immagine sostituita con l'avatar standard");
         } catch (error) {
+            setFormValue((prev) => ({
+                ...prev,
+                avatar: previousAvatar,
+                avatarFile: null,
+                avatarRemoved: false,
+            }));
             setServerError(error.message);
             toast.error("Impossibile aggiornare l'immagine");
         }
@@ -294,7 +306,35 @@ const ProfileUserPage = () => {
     const nomeOk = formValue.nome.trim().length >= 3;
 
     return (
-        <Card title="Aggiorna Profilo">
+        <div className={styles.profilePage}>
+            <Card title="Il mio profilo" sottotitolo="Gestisci i tuoi dati e il tuo avatar">
+                <section className={styles.profileSummary} aria-label="Riepilogo profilo">
+                    <div className={styles.profileHeader}>
+                        <div className={styles.profileImageWrap}>
+                            <img
+                                src={formValue.avatar || DEFAULT_AVATAR}
+                                alt="Avatar attuale"
+                                className={styles.profileImage}
+                                onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = DEFAULT_AVATAR;
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <h3 className={styles.profileName}>{formValue.nome || "Nuovo profilo"}</h3>
+                    <div className={styles.profileStats}>
+                        <div className={styles.profileRow}>
+                            <span>Tempo nei 100 metri</span>
+                            <strong>{formValue.timeForHundredMeters || "-"}</strong>
+                        </div>
+                        <div className={styles.profileRow}>
+                            <span>Stato</span>
+                            <strong>{formValue.status || "-"}</strong>
+                        </div>
+                    </div>
+                </section>
+
             <form className={styles.form} onSubmit={handleSubmit}>
                 <div className={styles.form_field}>
                     <Input
@@ -323,18 +363,6 @@ const ProfileUserPage = () => {
                     <label className={styles.avatarLabel} htmlFor="avatar">
                         Immagine profilo
                     </label>
-                    {formValue.avatar ? (
-                        <img
-                            src={formValue.avatar}
-                            alt="Avatar attuale"
-                            className={styles.avatarPreview}
-                            onError={(e) => {
-                                e.currentTarget.style.display = "none";
-                                e.currentTarget.nextSibling.style.display = "flex";
-                            }}
-                        />
-                        
-                    ) : null}
                     <input
                         id="avatar"
                         name="avatar"
@@ -352,12 +380,6 @@ const ProfileUserPage = () => {
                             Cancella immagine
                         </button>
                     )}
-                    <div
-                        className={styles.avatarFallback}
-                        style={{ display: formValue.avatar ? "none" : "flex" }}
-                    >
-                        Nessun avatar
-                    </div>
                     {formValue.avatar && (
                         <small className={styles.avatarUrl}></small>
                     )}
@@ -370,7 +392,8 @@ const ProfileUserPage = () => {
                     {serverError && <small className={styles.errorMessage}>{serverError}</small>}
                 </div>
             </form>
-        </Card>
+            </Card>
+        </div>
     );
 };
 

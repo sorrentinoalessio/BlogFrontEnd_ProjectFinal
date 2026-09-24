@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { userSelectors } from "../../../reducers/user.slice.js"; // adatta il path
 
 import { createPost } from "../../services/addPost.service.js";
+import { getWeatherForDate } from "../../services/weather.service.js";
 import { toast } from "react-toastify";
 import "leaflet/dist/leaflet.css";
 import { CircleMarker, MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
@@ -69,6 +70,7 @@ const AddPost = () => {
         tagText: "",
         imagePost: "",
         uploadedFile: null,
+        coordinates: null,
     });
 
     const [errors, setErrors] = useState({});
@@ -140,8 +142,25 @@ const AddPost = () => {
         if (form.eventDate?.trim()) formData.append("eventDate", form.eventDate.trim());
         if (form.imagePost?.trim()) formData.append("imagePost", form.imagePost.trim());
         if (form.uploadedFile) formData.append("uploadedFile", form.uploadedFile);
+        if (form.coordinates) {
+            formData.append("latitude", String(form.coordinates[0]));
+            formData.append("longitude", String(form.coordinates[1]));
+        }
 
         try {
+            if (form.coordinates && form.eventDate) {
+                try {
+                    const weather = await getWeatherForDate({
+                        latitude: form.coordinates[0],
+                        longitude: form.coordinates[1],
+                        date: form.eventDate,
+                    });
+                    formData.append("weather", JSON.stringify(weather));
+                } catch {
+                    toast.warning("Post creato senza dati meteo: servizio non disponibile");
+                }
+            }
+
             await createPost(formData, user?.accessToken);
             toast.success("Post creato con successo");
             navigate("/posts");
@@ -151,7 +170,7 @@ const AddPost = () => {
     };
 
     return (
-        <Card title="Nuova richiesta" >
+        <Card title="Nuovo allenamento" >
             <div className={styles.wrapper}>
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <div className={styles.field}>
@@ -412,7 +431,11 @@ const AddPost = () => {
                                         onClick={() => {
                                             const [latitude, longitude] = mapCoordinates;
                                             const locationLink = `https://www.google.com/maps/@${latitude},${longitude},17z`;
-                                            setForm((prev) => ({ ...prev, locality: locationLink }));
+                                            setForm((prev) => ({
+                                                ...prev,
+                                                locality: locationLink,
+                                                coordinates: [latitude, longitude],
+                                            }));
                                             setMapOpen(false);
                                         }}
                                     >

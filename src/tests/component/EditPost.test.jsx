@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import EditPost from '../../components/Posts/EditPost/EditPost.jsx';
-import { getPost } from '../../components/services/post.service.js';
+import { getPostDetails } from '../../components/services/postDetails.service.js';
 
 const navigateMock = vi.fn();
 
@@ -23,8 +23,8 @@ vi.mock('react-redux', async () => {
   };
 });
 
-vi.mock('../../components/services/post.service.js', () => ({
-  getPost: vi.fn(),
+vi.mock('../../components/services/postDetails.service.js', () => ({
+  getPostDetails: vi.fn(),
 }));
 
 vi.mock('../../components/services/editPost.service.js', () => ({
@@ -44,7 +44,7 @@ describe('EditPost', () => {
   });
 
   it('prefills the title with the existing post matching the route id', async () => {
-    getPost.mockResolvedValue({
+    getPostDetails.mockResolvedValue({
       _id: 'post-1',
       title: 'Titolo esistente',
       description: 'Descrizione esistente',

@@ -33,6 +33,7 @@ describe('RegitrationForm success', () => {
     expect(document.querySelector('input[name="email"]')).toBeInTheDocument()
     expect(document.querySelector('input[name="password"]')).toBeInTheDocument()
     expect(document.querySelector('input[name="confermaPassword"]')).toBeInTheDocument()
+    expect(document.querySelector('input[name="timeForHundredMeters"]')).toBeInTheDocument()
   })
 
   it('la card contiene un heading Registrati', () => {
@@ -51,6 +52,7 @@ describe('RegitrationForm success', () => {
     await user.type(screen.getByLabelText(/^Indirizzo email\*/i), 'test@example.com')
     await user.type(screen.getByLabelText(/^Password\*/i), 'password123')
     await user.type(screen.getByLabelText(/^Conferma password\*/i), 'password123')
+    await user.type(screen.getByLabelText(/tempo per 100 metri/i), '105')
     await user.click(screen.getByRole('button', { name: /registrati/i }))
 
     expect(screen.getByLabelText(/indirizzo email/i)).toHaveValue('test@example.com')
@@ -86,6 +88,7 @@ describe('RegitrationForm inserimento dati non validi', () => {
     await user.type(screen.getByLabelText(/^Indirizzo email\*/i), 'testexample.com')
     await user.type(screen.getByLabelText(/^Password\*/i), 'password123')
     await user.type(screen.getByLabelText(/^Conferma password\*/i), 'password12')
+    await user.type(screen.getByLabelText(/tempo per 100 metri/i), '105')
     await user.click(screen.getByRole('button', { name: /registrati/i }))
 
     expect(await screen.findByText(/^email non valida$/i)).toBeInTheDocument()
@@ -107,6 +110,7 @@ describe('RegitrationForm inserimento dati non validi', () => {
     await user.type(screen.getByLabelText(/^Indirizzo email\*/i), 'test@example.com')
     await user.type(screen.getByLabelText(/^Password\*/i), 'password123')
     await user.type(screen.getByLabelText(/^Conferma password\*/i), 'password123')
+    await user.type(screen.getByLabelText(/tempo per 100 metri/i), '1.05')
     await user.click(screen.getByRole('button', { name: /registrati/i }))
 
     expect(await screen.findByText(/something went wrong/i)).toBeInTheDocument()

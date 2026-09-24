@@ -404,7 +404,10 @@ export default function PublicPosts() {
                 </div>
 
                 <div className={styles.cardContent}>
-                  <p className={styles.description}><h3>Luogo dell' attività:</h3> {post.title || "Vimercate (presenziale)"}</p>
+                  <div className={styles.description}>
+                    <h3>Luogo dell' attività:</h3>
+                    <span>{post.title || "Vimercate (presenziale)"}</span>
+                  </div>
                  
                   <div className={styles.levelRow}>
                     <span className={styles.levelLabel}>Level score</span>
