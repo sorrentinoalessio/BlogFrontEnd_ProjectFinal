@@ -5,12 +5,13 @@
 
 .form > .titleField { order: 1; }
 .form > .descriptionField { order: 2; }
-.form > .mapField { order: 3; }
-.form > .field:not(.titleField):not(.descriptionField):not(.mapField),
-.form > .previewWrapper,
-.form > .actions { order: 4; }
-
-.form > .row { order: 6; }
+.form > .statusRow { order: 3; }
+.form > .eventDateField { order: 4; }
+.form > .timeField { order: 5; }
+.form > .mapField { order: 6; }
+.form > .coverPreview,
+.form > .coverField { order: 7; }
+.form > .actions { order: 8; }
 
 .form {
 	display: grid;

@@ -12,13 +12,14 @@
 	gap: 8px;
 }
 
-.timeField {
-	order: 5;
-}
-
-.eventDateField {
-	order: 4;
-}
+.titleField { order: 1; }
+.descriptionField { order: 2; }
+.statusRow { order: 3; }
+.eventDateField { order: 4; }
+.timeField { order: 5; }
+.mapField { order: 6; }
+.coverField { order: 7; }
+.actions { order: 8; }
 
 .label {
 	color: #292725;

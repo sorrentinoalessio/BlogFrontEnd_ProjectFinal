@@ -520,7 +520,7 @@ const EditPost = () => {
                         </div>
                     </div>
 
-                    <div className={styles.row}>
+                    <div className={`${styles.row} ${styles.statusRow}`}>
                         <div className={styles.field}>
                             <span className={styles.label} id="status-label">Stato</span>
                             <div className={styles.statusSelect}>
@@ -562,7 +562,7 @@ const EditPost = () => {
                     </div>
 
                                         {previewImage && (
-                        <div className={styles.previewWrapper}>
+                        <div className={`${styles.previewWrapper} ${styles.coverPreview}`}>
                             <img
                                 className={styles.previewImage}
                                 src={previewImage}
@@ -574,7 +574,7 @@ const EditPost = () => {
                         </div>
                     )}
 
-                    <div className={styles.field}>
+                    <div className={`${styles.field} ${styles.coverField}`}>
                         <label className={styles.label} htmlFor="uploadedFile">Immagine copertina</label>
                         <input
                             id="uploadedFile"

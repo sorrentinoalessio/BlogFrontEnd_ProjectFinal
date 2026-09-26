@@ -210,7 +210,7 @@ const AddPost = () => {
         <Card title="Nuovo allenamento" >
             <div className={styles.wrapper}>
                 <form className={styles.form} onSubmit={handleSubmit}>
-                    <div className={styles.field}>
+                    <div className={`${styles.field} ${styles.titleField}`}>
                         <label className={styles.label} htmlFor="title">Luogo*</label>
                         <input
                             id="title"
@@ -223,7 +223,7 @@ const AddPost = () => {
                         {errors.title && <small className={styles.error}>{errors.title}</small>}
                     </div>
 
-                    <div className={styles.field}>
+                    <div className={`${styles.field} ${styles.descriptionField}`}>
                         <label className={styles.label} htmlFor="description">Inserisci in dettaglio il ritrovo*</label>
                         <textarea
                             id="description"
@@ -378,7 +378,7 @@ const AddPost = () => {
                         </div>
                     </div>
 
-                    <div className={styles.row}>
+                    <div className={`${styles.row} ${styles.statusRow}`}>
                         <div className={styles.field}>
                             <span className={styles.label} id="add-status-label">Stato</span>
                             <div className={styles.statusSelect}>
@@ -421,7 +421,7 @@ const AddPost = () => {
 
 
 
-                    <div className={styles.field}>
+                    <div className={`${styles.field} ${styles.mapField}`}>
                         <span className={styles.label}>Luogo in mappa</span>
                         <button
                             type="button"
@@ -557,7 +557,7 @@ const AddPost = () => {
                         </div>
                     )}
 
-                    <div className={styles.field}>
+                    <div className={`${styles.field} ${styles.coverField}`}>
                         <label className={styles.label} htmlFor="uploadedFile">Immagine copertina</label>
                         <input
                             id="uploadedFile"
