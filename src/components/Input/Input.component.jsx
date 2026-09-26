@@ -23,7 +23,8 @@ const Input = ({ id, label, error, status = "", ...props }) => {
             type="button"
             className={styles.passwordToggle}
             onClick={() => setShowPassword((visible) => !visible)}
-            aria-label={showPassword ? "Nascondi password" : "Mostra password"}
+            aria-label={showPassword ? "Nascondi caratteri" : "Mostra caratteri"}
+            title={showPassword ? "Nascondi password" : "Mostra password"}
             aria-pressed={showPassword}
           >
             {showPassword ? "Nascondi" : "Mostra"}
