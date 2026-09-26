@@ -13,6 +13,10 @@
 }
 
 .timeField {
+	order: 5;
+}
+
+.eventDateField {
 	order: 4;
 }
 

@@ -6,10 +6,11 @@
 .form > .titleField { order: 1; }
 .form > .descriptionField { order: 2; }
 .form > .mapField { order: 3; }
-.form > .row,
 .form > .field:not(.titleField):not(.descriptionField):not(.mapField),
 .form > .previewWrapper,
 .form > .actions { order: 4; }
+
+.form > .row { order: 6; }
 
 .form {
 	display: grid;
@@ -22,6 +23,10 @@
 }
 
 .timeField {
+	order: 5;
+}
+
+.eventDateField {
 	order: 4;
 }
 

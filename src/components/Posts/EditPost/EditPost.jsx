@@ -377,7 +377,7 @@ const EditPost = () => {
                         />
                         {errors.description && <small className={styles.error}>{errors.description}</small>}
                     </div>
-                     <div className={styles.field}>
+                    <div className={`${styles.field} ${styles.eventDateField}`}>
                             <label className={styles.label} htmlFor="eventDate">Data appuntamento*</label>
                             <div className={styles.datePicker}>
                                 <button
