@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { getPostPublic } from "../../services/postPublic.service";
 import { useSocketEmit } from "../../../socket/useSocketEmit";
 import styles from "./PostPublicList.module.css";
+import { formatPostDate, formatPostTime } from "../postDateUtils";
 
 const getLevelScore = (post) => {
   const profileCandidates = [
@@ -414,6 +415,10 @@ export default function PublicPosts() {
                     <strong className={styles.levelValue}>{levelScore}</strong>
                   </div>
                   <p>Creata da:</p><h2 className={styles.title}>{post.ownerName || "Calogero"}</h2>
+                  <p className={styles.creationMeta}>
+                    Data: {formatPostDate(post)}
+                    {formatPostTime(post) && ` alle ${formatPostTime(post)}`}
+                  </p>
 
                 </div>
 

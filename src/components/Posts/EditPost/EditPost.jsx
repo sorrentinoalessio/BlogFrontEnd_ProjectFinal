@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Card from "../../Card/Card.jsx";
 import styles from "./EditPost.module.css";
@@ -20,6 +20,8 @@ const normalizeImageUrl = (value) => {
 };
 
 const weekDays = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+const hourOptions = Array.from({ length: 24 }, (_, h) => String(h).padStart(2, "0"));
+const minuteOptions = ["00", "15", "30", "45"];
 
 const toDateValue = (date) => {
     const year = date.getFullYear();
@@ -73,6 +75,7 @@ const EditPost = () => {
         description: "",
         status: "draft",
         eventDate: "",
+        eventTime: "",
         locality: "",
         tagText: "",
         imagePost: "",
@@ -84,6 +87,7 @@ const EditPost = () => {
     const [previewImage, setPreviewImage] = useState("");
     const [statusOpen, setStatusOpen] = useState(false);
     const [dateOpen, setDateOpen] = useState(false);
+    const [timeOpen, setTimeOpen] = useState(false);
     const [calendarMonth, setCalendarMonth] = useState(() => new Date());
     const [mapOpen, setMapOpen] = useState(false);
     const [mapCoordinates, setMapCoordinates] = useState(null);
@@ -91,6 +95,19 @@ const EditPost = () => {
     const [mapCenter, setMapCenter] = useState([41.9, 12.5]);
     const [mapSearchLoading, setMapSearchLoading] = useState(false);
     const [mapSearchError, setMapSearchError] = useState("");
+    const mapSearchInputRef = useRef(null);
+    const mapModalRef = useRef(null);
+
+    useEffect(() => {
+        if (!mapOpen) return;
+        mapModalRef.current?.scrollTo({ top: 0, behavior: "auto" });
+        mapSearchInputRef.current?.focus({ preventScroll: true });
+        requestAnimationFrame(() => mapModalRef.current?.scrollTo({ top: 0, behavior: "auto" }));
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [mapOpen]);
 
     const calendarDays = getCalendarDays(calendarMonth);
     const selectedDate = form.eventDate ? new Date(`${form.eventDate}T00:00:00`) : null;
@@ -98,18 +115,23 @@ const EditPost = () => {
         month: "long",
         year: "numeric",
     });
+    const [selectedHour, selectedMinute] = form.eventTime ? form.eventTime.split(":") : ["", ""];
 
     // converte il post (dal state di navigazione o dalla fetch) nello shape del form
     const populateForm = (post) => {
         if (!post) return;
         const existingImageUrl = post.imagePost ?? post.img ?? "";
         const normalizedImageUrl = normalizeImageUrl(existingImageUrl);
+        const eventSource = post.eventDate || post.appointmentDate || post.creationDate;
+        const eventSourceDate = eventSource ? new Date(eventSource) : null;
+        const hasTime = eventSourceDate && (eventSourceDate.getHours() !== 0 || eventSourceDate.getMinutes() !== 0);
         setForm({
             title: post.title ?? "",
             description: post.description ?? "",
             status: post.status ?? "draft",
-            eventDate: post.creationDate
-                ? new Date(post.creationDate).toISOString().slice(0, 10)
+            eventDate: eventSourceDate ? toDateValue(eventSourceDate) : "",
+            eventTime: hasTime
+                ? `${String(eventSourceDate.getHours()).padStart(2, "0")}:${String(eventSourceDate.getMinutes()).padStart(2, "0")}`
                 : "",
             locality: post.locality ?? post.location ?? "",
             tagText: Array.isArray(post.tag)
@@ -212,7 +234,10 @@ const EditPost = () => {
         formData.append("status", form.status);
         formData.append("tag", JSON.stringify(tags));
         if (form.locality.trim()) formData.append("locality", form.locality.trim());
-        if (form.eventDate?.trim()) formData.append("eventDate", form.eventDate.trim());
+        if (form.eventDate?.trim()) {
+            const time = form.eventTime?.trim() || "00:00";
+            formData.append("eventDate", `${form.eventDate.trim()}T${time}:00`);
+        }
         if (form.imagePost?.trim()) formData.append("imagePost", form.imagePost.trim());
         if (form.uploadedFile) formData.append("uploadedFile", form.uploadedFile);
 
@@ -237,6 +262,7 @@ const EditPost = () => {
                             type="button"
                             className={styles.mapPickerButton}
                             onClick={() => {
+                                window.scrollTo({ top: 0, left: 0, behavior: "auto" });
                                 setMapCoordinates(null);
                                 setMapSearchError("");
                                 setMapOpen(true);
@@ -254,7 +280,7 @@ const EditPost = () => {
 
                     {mapOpen && (
                         <div className={styles.mapModalBackdrop} role="presentation" onMouseDown={() => setMapOpen(false)}>
-                            <div className={styles.mapModal} role="dialog" aria-modal="true" aria-labelledby="edit-map-title" onMouseDown={(event) => event.stopPropagation()}>
+                            <div ref={mapModalRef} className={styles.mapModal} role="dialog" aria-modal="true" aria-labelledby="edit-map-title" onMouseDown={(event) => event.stopPropagation()}>
                                 <div className={styles.mapModalHeader}>
                                     <div>
                                         <span className={styles.mapEyebrow}>Luogo dell’attività</span>
@@ -265,6 +291,7 @@ const EditPost = () => {
                                 <p className={styles.mapHelp}>Cerca prima la città, poi clicca sulla mappa per scegliere il punto preciso.</p>
                                 <div className={styles.mapSearchRow}>
                                     <input
+                                        ref={mapSearchInputRef}
                                         className={styles.input}
                                         value={mapSearch}
                                         onChange={(event) => setMapSearch(event.target.value)}
@@ -421,6 +448,77 @@ const EditPost = () => {
                                 )}
                             </div>
                         </div>
+
+                    <div className={styles.field}>
+                        <label className={styles.label} htmlFor="eventTime">Orario appuntamento (opzionale)</label>
+                        <div className={styles.datePicker}>
+                            <button
+                                id="eventTime"
+                                type="button"
+                                className={`${styles.dateTrigger} ${form.eventTime ? styles.dateSelected : ""}`}
+                                aria-expanded={timeOpen}
+                                aria-haspopup="dialog"
+                                onClick={() => setTimeOpen((open) => !open)}
+                            >
+                                <span>{form.eventTime || "Seleziona un orario"}</span>
+                                <span className={styles.clockIcon} aria-hidden="true" />
+                            </button>
+                            {timeOpen && (
+                                <div className={styles.timePanel} role="dialog" aria-label="Seleziona orario appuntamento">
+                                    <div className={styles.timeColumns}>
+                                        <div className={styles.timeColumn} role="listbox" aria-label="Ore">
+                                            {hourOptions.map((h) => (
+                                                <button
+                                                    key={h}
+                                                    type="button"
+                                                    className={`${styles.timeOption} ${selectedHour === h ? styles.timeOptionActive : ""}`}
+                                                    onClick={() => setForm((prev) => ({ ...prev, eventTime: `${h}:${selectedMinute || "00"}` }))}
+                                                >
+                                                    {h}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <div className={styles.timeColumn} role="listbox" aria-label="Minuti">
+                                            {minuteOptions.map((m) => (
+                                                <button
+                                                    key={m}
+                                                    type="button"
+                                                    className={`${styles.timeOption} ${selectedMinute === m ? styles.timeOptionActive : ""}`}
+                                                    onClick={() => setForm((prev) => ({ ...prev, eventTime: `${selectedHour || "00"}:${m}` }))}
+                                                >
+                                                    {m}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className={styles.timeActions}>
+                                        <button
+                                            type="button"
+                                            className={styles.timeConfirm}
+                                            onClick={() => {
+                                                setForm((prev) => ({ ...prev, eventTime: prev.eventTime || `${selectedHour || "00"}:${selectedMinute || "00"}` }));
+                                                setTimeOpen(false);
+                                            }}
+                                        >
+                                            Conferma orario
+                                        </button>
+                                        {form.eventTime && (
+                                            <button
+                                                type="button"
+                                                className={styles.timeClear}
+                                                onClick={() => {
+                                                    setForm((prev) => ({ ...prev, eventTime: "" }));
+                                                    setTimeOpen(false);
+                                                }}
+                                            >
+                                                Cancella orario
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
                     <div className={styles.row}>
                         <div className={styles.field}>

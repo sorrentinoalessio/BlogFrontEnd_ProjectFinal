@@ -34,6 +34,27 @@
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.passwordWrap {
+	position: relative;
+}
+
+.passwordInput {
+	padding-right: 78px;
+}
+
+.passwordToggle {
+	position: absolute;
+	top: 50%;
+	right: 10px;
+	transform: translateY(-50%);
+	border: 0;
+	background: transparent;
+	color: #2d6972;
+	font-size: 0.82rem;
+	font-weight: 800;
+	cursor: pointer;
+}
+
 .input:focus {
 	border-color: #ee7d72;
 	box-shadow: 0 0 0 3px rgba(238, 125, 114, 0.14);

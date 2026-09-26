@@ -19,7 +19,9 @@ export const createPost = async (postData, token) => {
   if (!response.ok) {
     const message =
       typeof data === "string" ? data : data.message || `Errore HTTP: ${response.status}`;
-    throw new Error(message);
+    const error = new Error(message);
+    error.status = response.status;
+    throw error;
   }
 
   return data;

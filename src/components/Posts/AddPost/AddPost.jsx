@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../../Card/Card.jsx";
 import styles from "./AddPost.module.css";
-import { useSelector } from "react-redux";
-import { userSelectors } from "../../../reducers/user.slice.js"; // adatta il path
+import { useDispatch, useSelector } from "react-redux";
+import { clearUser, userSelectors } from "../../../reducers/user.slice.js";
 
 import { createPost } from "../../services/addPost.service.js";
 import { getWeatherForDate } from "../../services/weather.service.js";
@@ -21,6 +21,8 @@ const statusOptions = [
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
 const weekDays = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+const hourOptions = Array.from({ length: 24 }, (_, h) => String(h).padStart(2, "0"));
+const minuteOptions = ["00", "15", "30", "45"];
 
 const toDateValue = (date) => {
     const year = date.getFullYear();
@@ -61,6 +63,7 @@ const MapCenterController = ({ center }) => {
 
 const AddPost = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const user = useSelector(userSelectors.selectUser);
 
     const [form, setForm] = useState({
@@ -68,6 +71,7 @@ const AddPost = () => {
         description: "",
         status: "draft",
         eventDate: "",
+        eventTime: "",
         locality: "",
         tagText: "",
         imagePost: "",
@@ -78,6 +82,7 @@ const AddPost = () => {
     const [errors, setErrors] = useState({});
     const [statusOpen, setStatusOpen] = useState(false);
     const [dateOpen, setDateOpen] = useState(false);
+    const [timeOpen, setTimeOpen] = useState(false);
     const [calendarMonth, setCalendarMonth] = useState(() => new Date());
     const [mapOpen, setMapOpen] = useState(false);
     const [mapCoordinates, setMapCoordinates] = useState(null);
@@ -85,6 +90,19 @@ const AddPost = () => {
     const [mapCenter, setMapCenter] = useState([41.9, 12.5]);
     const [mapSearchLoading, setMapSearchLoading] = useState(false);
     const [mapSearchError, setMapSearchError] = useState("");
+    const mapSearchInputRef = useRef(null);
+    const mapModalRef = useRef(null);
+
+    useEffect(() => {
+        if (!mapOpen) return;
+        mapModalRef.current?.scrollTo({ top: 0, behavior: "auto" });
+        mapSearchInputRef.current?.focus({ preventScroll: true });
+        requestAnimationFrame(() => mapModalRef.current?.scrollTo({ top: 0, behavior: "auto" }));
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [mapOpen]);
 
     const calendarDays = getCalendarDays(calendarMonth);
     const selectedDate = form.eventDate ? new Date(`${form.eventDate}T00:00:00`) : null;
@@ -92,6 +110,7 @@ const AddPost = () => {
         month: "long",
         year: "numeric",
     });
+    const [selectedHour, selectedMinute] = form.eventTime ? form.eventTime.split(":") : ["", ""];
 
     const onChange = (e) => {
         const { name, value, files } = e.target;
@@ -148,7 +167,10 @@ const AddPost = () => {
         formData.append("status", form.status);
         formData.append("tag", JSON.stringify(tags));
         if (form.locality.trim()) formData.append("locality", form.locality.trim());
-        if (form.eventDate?.trim()) formData.append("eventDate", form.eventDate.trim());
+        if (form.eventDate?.trim()) {
+            const time = form.eventTime?.trim() || "00:00";
+            formData.append("eventDate", `${form.eventDate.trim()}T${time}:00`);
+        }
         if (form.imagePost?.trim()) formData.append("imagePost", form.imagePost.trim());
         if (form.uploadedFile) formData.append("uploadedFile", form.uploadedFile);
         if (form.coordinates) {
@@ -174,6 +196,12 @@ const AddPost = () => {
             toast.success("Post creato con successo");
             navigate("/posts");
         } catch (err) {
+            if (err.status === 401) {
+                dispatch(clearUser());
+                navigate("/login", { replace: true });
+                toast.error("Sessione scaduta. Accedi nuovamente.");
+                return;
+            }
             toast.error(err?.message || "Errore nella creazione del post");
         }
     };
@@ -279,6 +307,77 @@ const AddPost = () => {
                             </div>
                         </div>
 
+                    <div className={styles.field}>
+                        <label className={styles.label} htmlFor="eventTime">Orario appuntamento (opzionale)</label>
+                        <div className={styles.datePicker}>
+                            <button
+                                id="eventTime"
+                                type="button"
+                                className={`${styles.dateTrigger} ${form.eventTime ? styles.dateSelected : ""}`}
+                                aria-expanded={timeOpen}
+                                aria-haspopup="dialog"
+                                onClick={() => setTimeOpen((open) => !open)}
+                            >
+                                <span>{form.eventTime || "Seleziona un orario"}</span>
+                                <span className={styles.clockIcon} aria-hidden="true" />
+                            </button>
+                            {timeOpen && (
+                                <div className={styles.timePanel} role="dialog" aria-label="Seleziona orario appuntamento">
+                                    <div className={styles.timeColumns}>
+                                        <div className={styles.timeColumn} role="listbox" aria-label="Ore">
+                                            {hourOptions.map((h) => (
+                                                <button
+                                                    key={h}
+                                                    type="button"
+                                                    className={`${styles.timeOption} ${selectedHour === h ? styles.timeOptionActive : ""}`}
+                                                    onClick={() => setForm((prev) => ({ ...prev, eventTime: `${h}:${selectedMinute || "00"}` }))}
+                                                >
+                                                    {h}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <div className={styles.timeColumn} role="listbox" aria-label="Minuti">
+                                            {minuteOptions.map((m) => (
+                                                <button
+                                                    key={m}
+                                                    type="button"
+                                                    className={`${styles.timeOption} ${selectedMinute === m ? styles.timeOptionActive : ""}`}
+                                                    onClick={() => setForm((prev) => ({ ...prev, eventTime: `${selectedHour || "00"}:${m}` }))}
+                                                >
+                                                    {m}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className={styles.timeActions}>
+                                        <button
+                                            type="button"
+                                            className={styles.timeConfirm}
+                                            onClick={() => {
+                                                setForm((prev) => ({ ...prev, eventTime: prev.eventTime || `${selectedHour || "00"}:${selectedMinute || "00"}` }));
+                                                setTimeOpen(false);
+                                            }}
+                                        >
+                                            Conferma orario
+                                        </button>
+                                        {form.eventTime && (
+                                            <button
+                                                type="button"
+                                                className={styles.timeClear}
+                                                onClick={() => {
+                                                    setForm((prev) => ({ ...prev, eventTime: "" }));
+                                                    setTimeOpen(false);
+                                                }}
+                                            >
+                                                Cancella orario
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
                     <div className={styles.row}>
                         <div className={styles.field}>
                             <span className={styles.label} id="add-status-label">Stato</span>
@@ -328,6 +427,7 @@ const AddPost = () => {
                             type="button"
                             className={styles.mapPickerButton}
                             onClick={() => {
+                                window.scrollTo({ top: 0, left: 0, behavior: "auto" });
                                 setMapCoordinates(null);
                                 setMapSearchError("");
                                 setMapOpen(true);
@@ -351,6 +451,7 @@ const AddPost = () => {
                     {mapOpen && (
                         <div className={styles.mapModalBackdrop} role="presentation" onMouseDown={() => setMapOpen(false)}>
                             <div
+                                ref={mapModalRef}
                                 className={styles.mapModal}
                                 role="dialog"
                                 aria-modal="true"
@@ -369,6 +470,7 @@ const AddPost = () => {
                                 </p>
                                 <div className={styles.mapSearchRow}>
                                     <input
+                                        ref={mapSearchInputRef}
                                         className={styles.input}
                                         value={mapSearch}
                                         onChange={(event) => setMapSearch(event.target.value)}

@@ -4,7 +4,7 @@ import { resetPassword, verifyResetToken } from "../services/resetPass.service.j
 import Input from "../Input/Input.component.jsx";
 import Card from "../Card/Card.jsx";
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 const ResetPasswordForm = () => {
     const { token } = useParams();
@@ -130,6 +130,11 @@ const ResetPasswordForm = () => {
                     {serverError && <small className={styles.errorMessage}>{serverError}</small>}
                 </div>
             </form>
+            <div className={styles.links}>
+                <Link to="/login">Login</Link>
+                <span> | </span>
+                <Link to="/registration">Registrati</Link>
+            </div>
         </Card>
     );
 };

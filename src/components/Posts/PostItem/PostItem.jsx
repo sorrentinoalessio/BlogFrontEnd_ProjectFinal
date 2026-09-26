@@ -1,10 +1,10 @@
 import styles from "./PostItem.module.css";
+import { formatPostDate, formatPostTime } from "../postDateUtils";
 const PostItem = ({ post }) => {
   if (!post) return null;
 
-  const readableDate = post.creationDate
-    ? new Date(post.creationDate).toLocaleDateString("it-IT")
-    : "-";
+  const readableDate = formatPostDate(post);
+  const readableTime = formatPostTime(post);
 
   return (
     <article className={styles.card}>
@@ -12,7 +12,7 @@ const PostItem = ({ post }) => {
       <p className={styles.description}>{post.description}</p>
 
       <div className={styles.meta}>
-        <span>Pubblicato il: {readableDate}</span>
+        <span>Pubblicato il: {readableDate}{readableTime && ` alle ${readableTime}`}</span>
       </div>
 
       <div className={styles.tags}>

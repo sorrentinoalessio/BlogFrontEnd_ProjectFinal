@@ -263,6 +263,12 @@
   font-weight: 800;
 }
 
+.creationMeta {
+  margin: 8px 0 0;
+  color: #5c5752;
+  font-size: 0.78rem;
+}
+
 .star {
   color: #e1ad32;
 }

@@ -3,6 +3,7 @@ import { updatePostStatus } from "../../services/post.service";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PostList.module.css";
+import { formatPostDate, formatPostTime } from "../postDateUtils";
 
 const STEP = 5;
 const statusOptions = [
@@ -201,10 +202,8 @@ const PostList = ({ posts = [], user, onPostStatusChange }) => {
 
                             <div className={styles.meta}>
                                 <span>
-                                    Pubblicato il:{" "}
-                                    {post.creationDate
-                                        ? new Date(post.creationDate).toLocaleDateString("it-IT")
-                                        : "-"}
+                                    Pubblicato il: {formatPostDate(post)}
+                                    {formatPostTime(post) && ` alle ${formatPostTime(post)}`}
                                 </span>
                             </div>
 
