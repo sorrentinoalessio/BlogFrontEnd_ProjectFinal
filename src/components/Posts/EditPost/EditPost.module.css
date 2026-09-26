@@ -21,6 +21,10 @@
 	gap: 8px;
 }
 
+.timeField {
+	order: 4;
+}
+
 .label {
 	color: #292725;
 	font-size: 0.92rem;
@@ -463,6 +467,7 @@
 .mapModalActions .primaryBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 @media (max-width: 640px) {
+	.timeField { width: 100%; min-height: 82px; }
 	.mapModal { top: 70px; bottom: auto; padding: 12px; }
 	.mapCanvas { height: 145px; }
 	.mapSearchRow, .mapModalActions { flex-direction: column; align-items: stretch; }

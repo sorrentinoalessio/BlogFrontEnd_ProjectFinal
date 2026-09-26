@@ -449,7 +449,7 @@ const EditPost = () => {
                             </div>
                         </div>
 
-                    <div className={styles.field}>
+                    <div className={`${styles.field} ${styles.timeField}`}>
                         <label className={styles.label} htmlFor="eventTime">Orario appuntamento (opzionale)</label>
                         <div className={styles.datePicker}>
                             <button

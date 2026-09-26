@@ -12,6 +12,10 @@
 	gap: 8px;
 }
 
+.timeField {
+	order: 4;
+}
+
 .label {
 	color: #292725;
 	font-size: 0.92rem;
@@ -639,6 +643,11 @@
 }
 
 @media (max-width: 640px) {
+	.timeField {
+		width: 100%;
+		min-height: 82px;
+	}
+
 	.row {
 		grid-template-columns: 1fr;
 	}
