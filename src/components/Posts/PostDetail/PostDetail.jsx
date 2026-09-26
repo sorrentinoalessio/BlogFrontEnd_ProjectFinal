@@ -463,7 +463,19 @@ export default function PostDetail() {
                                                 <li key={c._id ?? i} className={sharedStyles.commentItem}>
                                                     <div className={sharedStyles.commentHeader}>
                                                         <div className={sharedStyles.commentUser}>
-                                                            <span className={sharedStyles.avatar}>{(c.authorName ?? c.author?.name ?? "U").charAt(0).toUpperCase()}</span>
+                                                            {c.authorAvatar || c.author?.avatar ? (
+                                                                <img
+                                                                    src={resolveAvatarUrl(c.authorAvatar || c.author.avatar) || SWIMMING_AVATAR}
+                                                                    alt=""
+                                                                    className={sharedStyles.avatar}
+                                                                    onError={(event) => {
+                                                                        event.currentTarget.onerror = null;
+                                                                        event.currentTarget.src = SWIMMING_AVATAR;
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <span className={sharedStyles.avatar}>{(c.authorName ?? c.author?.name ?? "U").charAt(0).toUpperCase()}</span>
+                                                            )}
                                                             <span className={sharedStyles.commentAuthor}>{c.authorName ?? c.author?.name ?? "Utente"}</span>
                                                         </div>
                                                     </div>

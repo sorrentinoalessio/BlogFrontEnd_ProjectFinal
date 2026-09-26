@@ -66,3 +66,21 @@ img {
 a {
   transition: all 0.2s ease;
 }
+
+/* Mobile: restore a readable base size (the 80% desktop scale makes text unreadable on small screens) */
+@media (max-width: 768px) {
+  html {
+    font-size: 100%;
+  }
+
+  body {
+    font-size: 1rem;
+  }
+
+  /* Font-size below 16px on inputs triggers automatic zoom-in on focus in iOS Safari */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
